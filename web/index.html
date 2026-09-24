@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>学生会推送档案助手</title>
+  <style>
+    :root { color-scheme: light; --ink:#253142; --muted:#778397; --line:#e5eaf0; --paper:#fff; --bg:#f4f7fb; --blue:#3d68df; --blue-soft:#edf2ff; --green:#168467; }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.6 "Segoe UI","Microsoft YaHei",sans-serif; }
+    .shell { min-height:100vh; display:grid; grid-template-columns:270px minmax(0,1fr); max-width:1500px; margin:auto; }
+    aside { background:#f8f9fc; border-right:1px solid var(--line); padding:24px 18px; display:flex; flex-direction:column; gap:22px; }
+    .brand { display:flex; gap:12px; align-items:center; padding:4px 5px; }
+    .logo { width:38px; height:38px; border-radius:12px; background:linear-gradient(140deg,#426fe8,#7b8df2); color:#fff; display:grid; place-items:center; font-weight:700; font-size:18px; }
+    .brand strong { display:block; font-size:15px; }
+    .brand span { display:block; color:var(--muted); font-size:12px; margin-top:1px; }
+    button { font:inherit; cursor:pointer; }
+    .new-chat { border:0; background:var(--blue); color:white; border-radius:10px; padding:11px 14px; text-align:left; box-shadow:0 5px 14px #3d68df26; }
+    .new-chat:hover,.send:hover { background:#3158c7; }
+    .new-push { border:1px solid #cbd6f5; background:#fff; color:#3d5fc9; border-radius:10px; padding:10px 14px; text-align:left; }
+    .new-push:hover { background:#f1f4ff; }
+    .side-label { color:#98a2b1; font-size:11px; letter-spacing:.08em; font-weight:700; margin:0 4px -10px; }
+    .suggestions { display:grid; gap:7px; }
+    .suggestion { border:1px solid transparent; background:transparent; color:#536176; text-align:left; border-radius:9px; padding:9px 10px; font-size:13px; }
+    .suggestion:hover { background:white; border-color:var(--line); color:var(--ink); }
+    .side-bottom { margin-top:auto; border-top:1px solid var(--line); padding:16px 5px 0; }
+    .db-stat { font-size:13px; color:#536176; }
+    .db-stat strong { color:var(--ink); }
+    .model-pill { display:inline-flex; margin-top:9px; border:1px solid #dbe3f0; background:#fff; border-radius:20px; padding:4px 9px; color:#58677d; font-size:11px; }
+    main { display:flex; min-height:100vh; flex-direction:column; background:var(--paper); }
+    header { height:66px; display:flex; align-items:center; justify-content:space-between; padding:0 30px; border-bottom:1px solid var(--line); }
+    header h1 { margin:0; font-size:16px; font-weight:650; }
+    .connection { color:var(--green); font-size:12px; display:flex; gap:7px; align-items:center; }
+    .dot { width:7px; height:7px; border-radius:99px; background:#2ca47f; }
+    .connection.offline { color:#af6a13; }
+    .connection.offline .dot { background:#e59c35; }
+    .notice { display:none; margin:16px auto 0; width:min(820px,calc(100% - 36px)); background:#fff8e9; color:#765322; border:1px solid #f1dfb6; border-radius:10px; padding:11px 14px; font-size:13px; }
+    .notice.visible { display:block; }
+    .scroll { flex:1; overflow:auto; padding:24px 20px; }
+    .conversation { width:min(820px,100%); margin:0 auto; }
+    .welcome { text-align:center; padding:12vh 10px 26px; }
+    .welcome-icon { width:52px; height:52px; margin:0 auto 17px; display:grid; place-items:center; border-radius:17px; background:var(--blue-soft); color:var(--blue); font-size:24px; }
+    .welcome h2 { margin:0 0 7px; font-size:23px; font-weight:650; letter-spacing:-.02em; }
+    .welcome p { margin:0 auto; max-width:520px; color:var(--muted); font-size:14px; }
+    .chips { display:flex; flex-wrap:wrap; justify-content:center; gap:9px; margin:25px auto 0; max-width:650px; }
+    .chip { background:#fff; color:#536176; border:1px solid var(--line); border-radius:20px; padding:8px 13px; font-size:12px; }
+    .chip:hover { color:var(--blue); border-color:#bdcafa; }
+    .message { margin:22px 0; display:flex; gap:11px; align-items:flex-start; }
+    .message.user { justify-content:flex-end; }
+    .avatar { flex:none; width:29px; height:29px; border-radius:10px; display:grid; place-items:center; background:var(--blue-soft); color:var(--blue); font-size:12px; font-weight:700; }
+    .user .avatar { order:2; color:#fff; background:#7384a2; }
+    .bubble { max-width:min(680px,calc(100% - 44px)); padding:11px 14px; border-radius:4px 13px 13px 13px; background:#f4f6f9; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .user .bubble { order:1; background:#eaf0ff; border-radius:13px 4px 13px 13px; }
+    .sources { margin:10px 0 0 40px; display:grid; gap:8px; }
+    .source-card { display:block; text-decoration:none; color:inherit; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:#fff; }
+    .source-card:hover { border-color:#bdcafa; background:#fbfcff; }
+    .source-title { color:#30415c; font-size:13px; font-weight:600; }
+    .source-meta { color:var(--muted); font-size:11px; margin-top:3px; }
+    .composer-wrap { border-top:1px solid var(--line); padding:17px 20px 20px; background:#fff; }
+    .composer { width:min(820px,100%); margin:auto; display:flex; align-items:flex-end; gap:10px; padding:9px 10px 9px 16px; border:1px solid #dce2eb; border-radius:15px; box-shadow:0 5px 20px #25314208; }
+    .composer:focus-within { border-color:#a9b9f2; box-shadow:0 0 0 3px #3d68df12; }
+    textarea { border:0; outline:0; resize:none; flex:1; max-height:130px; min-height:28px; padding:3px 0; font:inherit; color:var(--ink); background:transparent; }
+    textarea::placeholder { color:#9aa4b2; }
+    .send { flex:none; width:36px; height:36px; border:0; border-radius:11px; background:var(--blue); color:white; font-size:18px; }
+    .send:disabled { background:#bcc7da; cursor:wait; }
+    .footnote { text-align:center; color:#a0a8b4; font-size:10px; margin:8px 0 0; }
+    .mode-tabs { display:flex; gap:5px; background:#f2f4f8; border-radius:9px; padding:3px; }
+    .mode-tab { border:0; background:transparent; color:#788598; border-radius:7px; padding:6px 12px; font-size:12px; }
+    .mode-tab.active { background:#fff; color:#334b91; box-shadow:0 1px 4px #25314212; }
+    .generator { width:min(820px,100%); margin:0 auto; padding:10px 0 35px; }
+    .generator-intro { margin:0 0 18px; }
+    .generator-intro h2 { font-size:21px; margin:0 0 4px; }
+    .generator-intro p { color:var(--muted); font-size:13px; margin:0; }
+    .guideline-note { margin:16px 0; border:1px solid #e1e8fb; border-radius:10px; background:#f7f9ff; color:#52648e; padding:10px 12px; font-size:12px; }
+    .push-form { display:grid; gap:13px; }
+    .push-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .field { display:grid; gap:5px; }
+    .field label { color:#5d6a7c; font-size:12px; }
+    .field input,.field select,.field textarea { width:100%; border:1px solid #dce2eb; border-radius:9px; padding:9px 10px; min-height:38px; font:inherit; color:var(--ink); background:#fff; resize:vertical; outline:0; }
+    .field input:focus,.field select:focus,.field textarea:focus { border-color:#a9b9f2; box-shadow:0 0 0 3px #3d68df12; }
+    .field textarea { min-height:86px; }
+    .step-label { margin-top:8px; padding-top:12px; border-top:1px solid var(--line); color:#3d5fc9; font-size:12px; font-weight:700; letter-spacing:.04em; }
+    .generate-button { justify-self:start; border:0; border-radius:9px; background:var(--blue); color:#fff; padding:10px 18px; }
+    .generate-button:disabled { background:#bcc7da; cursor:wait; }
+    .draft-panel { margin-top:23px; border-top:1px solid var(--line); padding-top:20px; }
+    .draft-panel h3 { margin:0 0 8px; font-size:15px; }
+    .draft { border:1px solid var(--line); border-radius:10px; background:#fbfcfe; padding:17px; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.75; font-size:14px; }
+    .draft-sources { display:grid; gap:7px; margin-top:12px; }
+    .small-source { color:#52627b; font-size:12px; text-decoration:none; border:1px solid var(--line); border-radius:8px; padding:7px 9px; background:#fff; }
+    .small-source:hover { border-color:#bdcafa; }
+    .check-row { display:flex; flex-wrap:wrap; gap:14px; color:#5d6a7c; font-size:12px; }
+    .check-row label { display:flex; align-items:center; gap:6px; }
+    .visual-plan { display:grid; gap:8px; margin-top:12px; }
+    .visual-card { border:1px solid var(--line); border-radius:8px; padding:9px 10px; background:#fff; font-size:12px; color:#52627b; }
+    .visual-card strong { color:#30415c; }
+    .generated-image { width:100%; max-width:420px; border-radius:8px; display:block; margin-top:8px; }
+    @media(max-width:740px) { .shell{grid-template-columns:1fr} aside{display:none} header{padding:0 18px} .scroll{padding:16px 15px}.welcome{padding-top:7vh}.composer-wrap{padding:13px 12px 16px}.push-grid{grid-template-columns:1fr}.mode-tabs{display:none} }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <aside>
+      <div class="brand"><div class="logo">档</div><div><strong>推送档案助手</strong><span>从过往文章中找经验</span></div></div>
+      <button class="new-chat" id="newChat">＋　新对话</button>
+      <button class="new-push" id="newPush">✦　写一篇推送</button>
+      <p class="side-label">可以这样问</p>
+      <div class="suggestions">
+        <button class="suggestion">之前办过哪些新生类活动？</button>
+        <button class="suggestion">找一下迎新活动的报名和回顾推送</button>
+        <button class="suggestion">过去的讲座推送通常怎么安排内容？</button>
+      </div>
+      <div class="side-bottom">
+        <div class="db-stat">本地文章库　<strong id="articleCount">读取中…</strong></div>
+        <div class="model-pill" id="modelPill">gpt-6-sol · high</div>
+      </div>
+    </aside>
+    <main>
+      <header>
+        <h1>历史推送问答</h1>
+        <div class="mode-tabs">
+          <button class="mode-tab active" id="chatMode">查历史</button>
+          <button class="mode-tab" id="pushMode">写推送</button>
+        </div>
+        <div class="connection" id="connection"><span class="dot"></span><span id="connectionText">正在连接</span></div>
+      </header>
+      <div class="notice" id="notice"></div>
+      <div class="scroll" id="scroll">
+        <div class="conversation" id="conversation">
+          <section class="welcome" id="welcome">
+            <div class="welcome-icon">✦</div>
+            <h2>想从以前的推送里找什么？</h2>
+            <p>我会先检索本地文章，再结合找到的内容回答。每个回答都会列出参考文章，方便你核对原文。</p>
+            <div class="chips">
+              <button class="chip">之前办过哪些新生类活动？</button>
+              <button class="chip">找一下迎新活动的报名和回顾推送</button>
+              <button class="chip">过去的讲座推送通常怎么安排内容？</button>
+            </div>
+          </section>
+        </div>
+        <section class="generator" id="generatorView" hidden>
+          <div class="generator-intro">
+            <h2>生成秀米推送预览</h2>
+            <p>按向导填写活动资料，生成可导入秀米、再继续人工修改的 HTML 草稿。</p>
+          </div>
+          <div class="guideline-note">图片由你提供，Agent 不自行生成图片。当前支持本次上传的图片；以后可以把这里接成学院素材库。没有确认的信息会标为「[待确认]」。</div>
+          <form class="push-form" id="pushForm">
+            <div class="step-label">第一步　活动信息</div>
+            <div class="push-grid">
+              <div class="field"><label for="eventTime">活动时间</label><input id="eventTime" placeholder="例如：2026年10月10日 14:00"></div>
+              <div class="field"><label for="location">活动地点</label><input id="location" placeholder="例如：校本部东操场"></div>
+            </div>
+            <div class="push-grid">
+              <div class="field"><label for="theme">活动主题（必填）</label><input id="theme" required placeholder="例如：新生校园定向越野"></div>
+              <div class="field"><label for="pushType">文章类型</label><select id="pushType"><option>预热</option><option>总结</option></select></div>
+            </div>
+            <div class="field"><label for="audience">面向对象</label><input id="audience" placeholder="例如：工学院2026级新生"></div>
+            <div class="field"><label for="activityIntro">活动介绍（必填）</label><textarea id="activityIntro" required placeholder="用自己的话介绍活动要做什么、为什么举办、希望读者了解什么"></textarea></div>
+            <div class="step-label">第二步　已有文字资料</div>
+            <div class="field"><label for="copyBackground">预使用文案：背景</label><textarea id="copyBackground" placeholder="已经写好的背景材料，没有可以留空"></textarea></div>
+            <div class="field"><label for="copyProcess">预使用文案：流程</label><textarea id="copyProcess" placeholder="已经写好的活动流程、环节、时间安排，没有可以留空"></textarea></div>
+            <div class="field"><label for="copySummary">预使用文案：总结</label><textarea id="copySummary" placeholder="总结稿可填写现场情况、成果、感受；预热稿可以留空"></textarea></div>
+            <div class="field"><label for="plan">策划案</label><textarea id="plan" placeholder="可以粘贴策划案中的目标、对象、流程、注意事项等，Agent 会把它当作资料整理"></textarea></div>
+            <div class="step-label">第三步　素材与审核</div>
+            <div class="push-grid">
+              <div class="field"><label for="reviewer">审核人</label><input id="reviewer" placeholder="例如：尹老师"></div>
+              <div class="field"><label for="imagePool">预使用图片 / 图片池</label><input id="imagePool" type="file" accept="image/*" multiple><small id="imageNames" class="source-meta">可选择首图、正文图、尾图；图片会嵌入导出的 HTML。</small></div>
+            </div>
+            <button class="generate-button" id="generateButton">生成秀米预览</button>
+          </form>
+          <div class="draft-panel" id="draftPanel" hidden>
+            <h3>秀米推送预览</h3>
+            <div class="draft" id="draftText"></div>
+            <div class="source-meta" id="draftMeta"></div>
+            <div class="visual-plan" id="visualPlan"></div>
+            <div class="check-row" id="xiumiActions"></div>
+            <div class="draft-sources" id="draftSources"></div>
+          </div>
+        </section>
+      </div>
+      <div class="composer-wrap">
+        <form class="composer" id="chatForm">
+          <textarea id="messageInput" rows="1" placeholder="问问过去的活动、推送或写法…" aria-label="输入问题"></textarea>
+          <button class="send" id="sendButton" aria-label="发送">↑</button>
+        </form>
+        <p class="footnote">答案根据本地文章库生成；活动事实请以原文和实际记录为准。</p>
+      </div>
+    </main>
+  </div>
+  <script>
+    const conversation = document.getElementById('conversation');
+    const welcome = document.getElementById('welcome');
+    const input = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const history = [];
+    const generatorView = document.getElementById('generatorView');
+    const composerWrap = document.querySelector('.composer-wrap');
+    const headerTitle = document.querySelector('header h1');
+
+    function addMessage(role, text, sources = []) {
+      welcome?.remove();
+      const row = document.createElement('div');
+      row.className = `message ${role}`;
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = role === 'user' ? '我' : '档';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = text;
+      row.append(avatar, bubble);
+      conversation.append(row);
+      if (sources.length) {
+        const list = document.createElement('div');
+        list.className = 'sources';
+        const label = document.createElement('div');
+        label.className = 'source-meta';
+        label.textContent = `参考文章 · ${sources.length} 篇`;
+        list.append(label);
+        for (const source of sources) {
+          const link = document.createElement('a');
+          link.className = 'source-card';
+          link.href = source.source_url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          const title = document.createElement('div');
+          title.className = 'source-title';
+          title.textContent = source.title || '未命名文章';
+          const meta = document.createElement('div');
+          meta.className = 'source-meta';
+          meta.textContent = `${source.account_name || '公众号'} · ${source.published_at || '发布时间未识别'} · ${source.import_status === 'partial' ? '图片类文章或部分内容' : '已导入'}`;
+          link.append(title, meta);
+          list.append(link);
+        }
+        conversation.append(list);
+      }
+      document.getElementById('scroll').scrollTop = document.getElementById('scroll').scrollHeight;
+      return row;
+    }
+
+    async function sendMessage(value) {
+      const message = (value ?? input.value).trim();
+      if (!message || sendButton.disabled) return;
+      addMessage('user', message);
+      input.value = '';
+      input.style.height = '28px';
+      sendButton.disabled = true;
+      const waiting = addMessage('assistant', '正在查找本地文章并整理回答…');
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({message, history: history.slice(-8)})
+        });
+        const data = await response.json();
+        waiting.remove();
+        if (!response.ok) throw new Error(data.detail || '请求失败，请稍后重试。');
+        addMessage('assistant', data.answer, data.sources || []);
+        history.push({role:'user', content:message}, {role:'assistant', content:data.answer});
+      } catch (error) {
+        waiting.remove();
+        addMessage('assistant', error.message);
+      } finally {
+        sendButton.disabled = false;
+        input.focus();
+      }
+    }
+
+    function setMode(mode) {
+      const writing = mode === 'push';
+      document.getElementById('chatMode').classList.toggle('active', !writing);
+      document.getElementById('pushMode').classList.toggle('active', writing);
+      document.getElementById('conversation').hidden = writing;
+      generatorView.hidden = !writing;
+      composerWrap.hidden = writing;
+      headerTitle.textContent = writing ? '推送 Agent' : '历史推送问答';
+      if (writing) document.getElementById('theme').focus();
+    }
+
+    let lastXiumiHtml = '';
+
+    function readSelectedImages() {
+      const files = [...(document.getElementById('imagePool').files || [])].slice(0, 12);
+      return Promise.all(files.map(file => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve({name: file.name, data_url: reader.result});
+        reader.onerror = () => reject(new Error(`图片读取失败：${file.name}`));
+        reader.readAsDataURL(file);
+      })));
+    }
+
+    async function generatePush() {
+      const button = document.getElementById('generateButton');
+      const theme = document.getElementById('theme').value.trim();
+      const intro = document.getElementById('activityIntro').value.trim();
+      if (theme.length < 2 || intro.length < 10 || button.disabled) return;
+      button.disabled = true;
+      button.textContent = '正在生成秀米 HTML…';
+      const panel = document.getElementById('draftPanel');
+      panel.hidden = false;
+      document.getElementById('draftText').textContent = '正在整理活动资料并生成预览，请稍候…';
+      document.getElementById('draftSources').replaceChildren();
+      document.getElementById('visualPlan').replaceChildren();
+      document.getElementById('xiumiActions').replaceChildren();
+      try {
+        const assets = await readSelectedImages();
+        const response = await fetch('/api/generate-xiumi-push', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            event_time: document.getElementById('eventTime').value.trim(),
+            location: document.getElementById('location').value.trim(),
+            theme,
+            push_type: document.getElementById('pushType').value,
+            audience: document.getElementById('audience').value.trim(),
+            activity_intro: intro,
+            copy_background: document.getElementById('copyBackground').value.trim(),
+            copy_process: document.getElementById('copyProcess').value.trim(),
+            copy_summary: document.getElementById('copySummary').value.trim(),
+            plan: document.getElementById('plan').value.trim(),
+            reviewer: document.getElementById('reviewer').value.trim(),
+            assets
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || '秀米推送生成失败，请稍后重试。');
+        lastXiumiHtml = data.xiumi_html || '';
+        document.getElementById('draftText').textContent = data.draft || '没有生成文字。';
+        const templateLabel = data.template_source && data.template_source.source_title
+          ? `参考模板：${data.template_source.source_title}`
+          : '参考模板：默认排版';
+        document.getElementById('draftMeta').textContent = `生成模型：${data.model} · ${templateLabel} · 图片素材：${(data.assets || []).length} 张 · 可继续人工修改`;
+        const visualPlan = document.getElementById('visualPlan');
+        for (const asset of (data.assets || [])) {
+          const card = document.createElement('div');
+          card.className = 'visual-card';
+          card.textContent = `已加入秀米 HTML：${asset.name}`;
+          visualPlan.append(card);
+        }
+        const actions = document.getElementById('xiumiActions');
+        const preview = document.createElement('a');
+        preview.className = 'small-source'; preview.href = data.preview_url; preview.target = '_blank'; preview.rel = 'noopener noreferrer'; preview.textContent = '打开秀米预览';
+        const download = document.createElement('a');
+        download.className = 'small-source'; download.href = data.download_url; download.download = ''; download.textContent = '下载 HTML 文件';
+        const copy = document.createElement('button');
+        copy.type = 'button'; copy.className = 'small-source'; copy.textContent = '复制 HTML 到秀米';
+        copy.addEventListener('click', async () => {
+          try { await navigator.clipboard.writeText(lastXiumiHtml); copy.textContent = '已复制，可粘贴到秀米'; }
+          catch { copy.textContent = '复制失败，请打开预览页后手动复制'; }
+        });
+        actions.append(preview, download, copy);
+        if ((data.checks || []).length) {
+          const checks = document.createElement('div');
+          checks.className = 'visual-card';
+          checks.textContent = `提交前检查：${data.checks.join('；')}`;
+          visualPlan.append(checks);
+        }
+        const sources = document.getElementById('draftSources');
+        const guideline = document.createElement('a');
+        guideline.className = 'small-source';
+        guideline.href = data.guideline_source;
+        guideline.target = '_blank';
+        guideline.rel = 'noopener noreferrer';
+        guideline.textContent = '最高层指示原文：工学 · 推送模板';
+        sources.append(guideline);
+        if (data.template_source && data.template_source.source_url) {
+          const templateLink = document.createElement('a');
+          templateLink.className = 'small-source';
+          templateLink.href = data.template_source.source_url;
+          templateLink.target = '_blank';
+          templateLink.rel = 'noopener noreferrer';
+          templateLink.textContent = `本次参考模板原文：${data.template_source.source_title || '历史文章'}`;
+          sources.append(templateLink);
+        }
+        for (const item of (data.sources || [])) {
+          const link = document.createElement('a');
+          link.className = 'small-source';
+          link.href = item.source_url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = `参考案例：${item.title} · ${item.published_at || '时间未识别'}`;
+          sources.append(link);
+        }
+        document.getElementById('scroll').scrollTop = document.getElementById('scroll').scrollHeight;
+      } catch (error) {
+        document.getElementById('draftText').textContent = error.message;
+        document.getElementById('draftMeta').textContent = '';
+      } finally {
+        button.disabled = false;
+        button.textContent = '生成秀米预览';
+      }
+    }
+
+    document.getElementById('chatForm').addEventListener('submit', event => {
+      event.preventDefault();
+      sendMessage();
+    });
+    input.addEventListener('input', () => {
+      input.style.height = '28px';
+      input.style.height = `${Math.min(input.scrollHeight, 130)}px`;
+    });
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }
+    });
+    document.querySelectorAll('.suggestion,.chip').forEach(button => {
+      button.addEventListener('click', () => sendMessage(button.textContent.trim()));
+    });
+    document.getElementById('newChat').addEventListener('click', () => location.reload());
+    document.getElementById('newPush').addEventListener('click', () => setMode('push'));
+    document.getElementById('chatMode').addEventListener('click', () => setMode('chat'));
+    document.getElementById('pushMode').addEventListener('click', () => setMode('push'));
+    document.getElementById('pushForm').addEventListener('submit', event => {
+      event.preventDefault();
+      generatePush();
+    });
+    document.getElementById('imagePool').addEventListener('change', event => {
+      const names = [...(event.target.files || [])].slice(0, 12).map(file => file.name);
+      document.getElementById('imageNames').textContent = names.length
+        ? `已选择 ${names.length} 张：${names.join('、')}`
+        : '可选择首图、正文图、尾图；图片会嵌入导出的 HTML。';
+    });
+
+    fetch('/api/status').then(r => r.json()).then(status => {
+      document.getElementById('articleCount').textContent = `${status.article_count} 篇`;
+      document.getElementById('modelPill').textContent = `${status.model} · ${status.reasoning_effort}`;
+      if (status.api_key_configured) {
+        const provider = (status.api_provider || '').includes('aizex') ? 'Aizex API' : '模型 API';
+        document.getElementById('connectionText').textContent = `${provider} 已配置`;
+      } else {
+        const connection = document.getElementById('connection');
+        connection.classList.add('offline');
+        document.getElementById('connectionText').textContent = '等待配置 API 密钥';
+        const notice = document.getElementById('notice');
+        notice.textContent = '聊天页面和本地文章检索已就绪。填写根目录 .env 文件中的 OPENAI_API_KEY 并重启后，即可调用 GPT-6 Sol。密钥不会发给浏览器。';
+        notice.classList.add('visible');
+      }
+    }).catch(() => {
+      document.getElementById('connectionText').textContent = '本地服务未就绪';
+    });
+  </script>
+</body>
+</html>

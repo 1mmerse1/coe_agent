@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.py[cod]
+.venv/
+data/
+
+# Local editor and generated files
+*.log
+.DS_Store

@@ -1,0 +1,2130 @@
+学生会工作流搭建
+========
+
+【提问 轮数1】
+要搭建一个学生会的工作流agent 主要用于加快一些重复性工作 比如活动策划案 活动预热推送 问卷 ppt制作 反馈问卷 总结推送 这一套流程 现在可以有过往的活动数据 技术上应该怎么实现
+
+【回答内容 轮数1】
+可以，而且这个场景非常适合做 Agent。技术上我不建议一开始做成“一个超级 Agent，输入一句话自动包办所有事情”，而是做成 **工作流引擎 + 多个专业 Agent + 历史活动知识库 + 模板系统 + 人工审核节点**。
+
+你们真正要自动化的，其实是一条完整的“活动生命周期”：
+
+> 活动需求 → 策划案 → 审核修改 → 预热推送 → 报名/前置问卷 → PPT/现场物料 → 活动执行 → 反馈问卷 → 数据分析 → 总结推送 → 活动归档
+
+### 1. 整体技术架构
+
+我会设计成下面这样：
+
+```text
+                    ┌────────────────────┐
+                    │   学生会 Agent UI   │
+                    │ Web / 飞书 / 企业微信 │
+                    └─────────┬──────────┘
+                              │
+                    用户输入活动需求
+                              │
+                              ▼
+                  ┌──────────────────────┐
+                  │   Workflow Orchestrator
+                  │   工作流状态机 / Agent
+                  └──────────┬───────────┘
+                             │
+       ┌─────────────────────┼──────────────────────┐
+       ▼                     ▼                      ▼
+  策划 Agent              宣传 Agent             数据 Agent
+       │                     │                      │
+  活动策划案             预热/总结推送          问卷分析
+  时间安排               标题/文案              满意度
+  人员分工               海报文案                建议聚类
+  预算等                 公众号格式              活动复盘
+
+       ┌─────────────────────┼──────────────────────┐
+       ▼                     ▼                      ▼
+   问卷 Agent             PPT Agent              复盘 Agent
+       │                     │                      │
+   报名问卷              自动生成PPT            汇总全部数据
+   反馈问卷              演讲稿                  生成复盘报告
+   题目设计              活动介绍                沉淀知识库
+
+                             │
+                             ▼
+                 ┌─────────────────────┐
+                 │    Knowledge Base    │
+                 │   历史活动知识库/RAG   │
+                 ├─────────────────────┤
+                 │ 往年策划案            │
+                 │ 往年推送              │
+                 │ PPT                  │
+                 │ 问卷 + 反馈数据        │
+                 │ 活动照片/总结          │
+                 │ 学生会规范/模板         │
+                 └─────────────────────┘
+```
+
+关键点是：**LLM 负责理解和生成，Workflow 负责控制流程，数据库负责记住活动状态，RAG 负责利用历史经验，代码/工具负责真正创建 PPT、问卷、文档。**
+
+### 2. 历史活动数据不要直接全部塞给模型
+
+你提到“现在可以有过往的活动数据”，这其实是这个项目最有价值的部分。
+
+比如你们以前办过：
+
+```text
+2024迎新晚会/
+  策划案.docx
+  宣传推送.docx
+  主持稿.docx
+  PPT.pptx
+  报名数据.xlsx
+  反馈问卷.xlsx
+  活动总结.docx
+
+2025迎新晚会/
+  ...
+```
+
+不要简单把这些文件上传给模型，而应该做成 **结构化活动库 + 文档知识库**。
+
+结构化部分可以存在 PostgreSQL：
+
+```text
+Event
+
+event_id
+event_name
+event_type
+date
+department
+target_audience
+expected_attendance
+actual_attendance
+budget
+satisfaction
+负责人
+```
+
+同时建立：
+
+```text
+EventDocument
+
+document_id
+event_id
+document_type
+content
+file_url
+embedding
+created_at
+```
+
+document_type 可以是：
+
+```text
+proposal
+promotion
+questionnaire
+ppt
+feedback
+summary
+```
+
+这样以后有人说：
+
+> “下个月准备办一个面向新生的职业规划分享会，预计100人。”
+
+系统就可以先检索：
+
+> 找过去 3 年
+> 面向新生 + 分享会/讲座 + 80~150人
+> 最相似的 5 个活动
+
+然后把这些活动的：
+
+**策划结构 + 宣传方式 + 实际参与人数 + 满意度 + 反馈问题**
+
+交给模型。
+
+这比单纯让 GPT “写一个活动策划案”强很多。
+
+---
+
+### 3. Agent 不需要很多，建议先拆成 6 个能力模块
+
+第一版甚至不需要真的做复杂 Multi-Agent。
+
+可以逻辑上拆：
+
+**Planner Agent**
+
+输入：
+
+```text
+活动主题
+时间
+地点
+预算
+对象
+人数
+目标
+```
+
+自动参考历史活动，生成：
+
+```text
+活动背景
+活动目标
+活动流程
+时间安排
+人员分工
+物资清单
+预算
+风险预案
+宣传方案
+KPI
+```
+
+然后人工确认。
+
+**Content Agent**
+
+策划确认之后，直接读取策划案生成：
+
+```text
+公众号预热推送
+朋友圈文案
+群通知
+报名通知
+活动当天提醒
+活动结束总结推送
+```
+
+重点是不要每次重新输入活动信息，而是所有 Agent 共用：
+
+```text
+Event Context
+```
+
+例如：
+
+```json
+{
+  "event_name": "AI职业规划分享会",
+  "date": "2026-10-20",
+  "location": "A101",
+  "audience": "大一大二学生",
+  "capacity": 120,
+  "speaker": "...",
+  "goal": "...",
+  "status": "promotion"
+}
+```
+
+这会成为整个系统的“Single Source of Truth”。
+
+**Questionnaire Agent**
+
+根据活动类型自动生成报名问卷和反馈问卷。
+
+反馈问卷甚至可以参考历史活动的问题，例如历史数据发现：
+
+> “讲座时间过长”经常被反馈
+
+那么下一次同类型活动自动加入：
+
+> “您认为本次活动时长是否合适？”
+
+活动结束后直接进入 Data Agent。
+
+**PPT Agent**
+
+这里不要让 LLM 自己“设计 PPT”。
+
+更稳定的做法是：
+
+```text
+LLM
+ ↓
+生成结构化 JSON
+ ↓
+PPT renderer
+ ↓
+套学生会模板
+ ↓
+pptx
+```
+
+比如模型输出：
+
+```json
+{
+  "title": "AI时代的职业规划",
+  "slides": [
+    {
+      "type": "title",
+      "title": "AI时代的职业规划"
+    },
+    {
+      "type": "agenda",
+      "items": [
+        "行业变化",
+        "职业选择",
+        "能力准备"
+      ]
+    }
+  ]
+}
+```
+
+再用 `python-pptx` / PptxGenJS 之类生成 PPT。
+
+这样字体、Logo、页脚、颜色、版式都固定，稳定性会高很多。
+
+**Analysis Agent**
+
+反馈问卷回来以后，不只是“总结一下”。
+
+程序先计算：
+
+```text
+参与人数
+到场率
+平均满意度
+NPS（如果使用）
+各问题分布
+不同年级差异
+```
+
+LLM 再负责处理开放题：
+
+```text
+主题聚类
+正面反馈
+负面反馈
+高频建议
+典型意见
+```
+
+最后得到：
+
+> 73% 的负面意见集中在“活动时长”和“互动环节不足”。
+
+这类结论。
+
+**Review Agent**
+
+最后一个非常重要：审核。
+
+检查：
+
+```text
+日期是否一致
+地点是否一致
+嘉宾名字是否一致
+人数是否一致
+推送和策划案是否矛盾
+是否出现未确认的信息
+是否符合学生会文案规范
+```
+
+它可以大幅降低 AI “自己编信息”的风险。
+
+---
+
+### 4. 真正核心其实是 Workflow
+
+比如创建一个活动：
+
+```text
+CREATE_EVENT
+     │
+     ▼
+生成策划案
+     │
+     ▼
+【人工审核】
+     │
+     ├── 修改 → Planner Agent
+     │
+     ▼
+APPROVED
+     │
+     ├─────────────┐
+     ▼             ▼
+生成宣传         生成报名问卷
+     │             │
+     ▼             ▼
+【人工审核】     【人工审核】
+     │             │
+     └──────┬──────┘
+            ▼
+        活动进行
+            │
+            ▼
+        反馈问卷
+            │
+            ▼
+        数据分析
+            │
+            ▼
+        自动复盘
+            │
+       ┌────┴────┐
+       ▼         ▼
+    总结推送    复盘报告
+       │
+       ▼
+     归档
+       │
+       ▼
+更新 Knowledge Base
+```
+
+这比“聊天机器人”重要得多。
+
+因为学生会真正需要的是：
+
+**我创建一次活动，后面的东西自动沿着流程产生。**
+
+而不是每次：
+
+> 帮我写策划案
+> 帮我写推送
+> 帮我生成问卷
+> 帮我做PPT
+> 帮我分析反馈
+
+重新和 AI 聊五次。
+
+---
+
+### 5. 技术栈可以非常务实
+
+如果你们准备自己开发，我比较推荐：
+
+```text
+Frontend
+Next.js
+↓
+Backend
+FastAPI / Node.js
+↓
+Workflow
+LangGraph
+↓
+LLM
+OpenAI API
+↓
+Database
+PostgreSQL
+↓
+Vector Search
+pgvector
+↓
+File Storage
+S3 / OSS
+↓
+Document Generation
+python-docx
+python-pptx / PptxGenJS
+openpyxl
+↓
+Charts
+Python
+```
+
+如果学生会主要使用飞书，可以进一步变成：
+
+```text
+飞书机器人
+     ↓
+Agent Backend
+     ↓
+飞书多维表格
+飞书文档
+飞书问卷/表单
+```
+
+这样用户甚至不需要打开一个新的系统。
+
+---
+
+### 6. 数据库设计我会特别加入“版本”和“审批”
+
+至少有这些核心对象：
+
+```text
+User
+Event
+EventVersion
+Task
+Document
+DocumentVersion
+Questionnaire
+Response
+FeedbackAnalysis
+KnowledgeChunk
+Template
+```
+
+例如：
+
+```text
+Event
+ ├── Proposal v1
+ ├── Proposal v2
+ ├── Proposal FINAL
+ │
+ ├── Promotion
+ ├── Questionnaire
+ ├── PPT
+ │
+ ├── Feedback
+ │
+ └── Summary
+```
+
+千万不要只保存最终结果。
+
+因为真正有价值的数据是：
+
+> **AI生成了什么 → 人类改了什么。**
+
+例如 AI 经常写：
+
+> “进一步丰富校园文化生活……”
+
+部长每次都改掉。
+
+那么这些修改记录以后可以成为非常好的训练/优化数据。
+
+---
+
+### 7. 第一阶段先不要 Fine-tuning
+
+有历史活动数据，很容易第一反应是：
+
+> “要不要训练自己的模型？”
+
+我建议先不要。
+
+第一阶段：
+
+**RAG + Prompt + Template + Few-shot**
+
+就够了。
+
+例如生成推送的时候：
+
+```text
+System:
+你是XX大学学生会宣传部编辑。
+
+Writing Guide:
+{学生会文案规范}
+
+Current Event:
+{当前活动数据}
+
+Similar Examples:
+{历史上最相似的3篇优秀推送}
+
+Task:
+生成本次活动预热推送。
+
+Rules:
+不得虚构嘉宾、时间、地点等信息。
+缺失信息使用 [待确认]。
+```
+
+实际效果通常已经会非常不错。
+
+等你们积累几百个：
+
+```text
+AI Draft → Human Final Version
+```
+
+再考虑 fine-tuning。
+
+---
+
+### 8. 最值得做的是“活动记忆”
+
+例如系统办完 30 个活动之后，用户问：
+
+> “我们准备再办一次新生破冰活动，有什么需要注意？”
+
+Agent 不应该只回答通用知识。
+
+它应该能从你们自己的数据里发现：
+
+```text
+过去4次新生破冰活动
+
+平均报名：183
+平均到场：127
+到场率：69%
+
+主要负面反馈：
+1. 游戏规则复杂 31%
+2. 分组等待时间长 24%
+3. 场地拥挤 18%
+
+满意度最高的一次：
+2025秋季新生破冰
+满意度 4.67/5
+
+可能原因：
+人数控制在120人
+每组8人
+工作人员/参与者 = 1:10
+...
+```
+
+这时候它就不再只是一个“AI 文案工具”，而开始变成**学生会组织知识系统**。
+
+### 我建议你们的 MVP
+
+不要第一版就把所有东西做完。我会先做一条最能体现价值的闭环：
+
+**创建活动 → 检索历史相似活动 → 自动生成策划案 → 人工修改/批准 → 自动生成预热推送 + 报名问卷 + PPT → 活动后导入反馈 → 自动分析 → 生成总结推送 → 整个活动自动归档。**
+
+把这一条跑通，你们基本就已经有一个真正能用的学生会 Activity Agent 了，而不是一个套壳聊天机器人。
+
+如果这是一个准备实际开发/参赛/课程项目，我还可以进一步直接给你画出 **系统架构图 + Agent Workflow + 数据库 ER 图 + RAG 数据流 + API 设计**，基本可以直接拿去开始写代码。
+
+
+【提问 轮数2】
+初版我们考虑做推送 / 海报的自动制作 agent该怎么读取过去的推送 怎么生成推送呢 主要是秀米的格式  以及现在一般可以爬取公众号上的推送了吗
+
+【回答内容 轮数2】
+可以。你们这个 MVP 如果先只做 **“推送 Agent + 海报 Agent”**，范围其实非常合适，而且能很快做出效果。
+
+先说一个关键判断：**不要把“生成推送”理解成让大模型输出一篇 Markdown。** 你们真正要生成的是：
+
+> 历史推送 → 学习“内容风格 + 排版风格” → 根据新活动资料生成文案 → 自动套用秀米风格 → 输出可编辑的秀米图文 → 人工微调 → 发布
+
+而且秀米这一段比我原本预想的更好做：秀米官方确实提供了“图文同步”接口，可以把秀米图文的 **HTML 和图片**同步给你们自己的平台，也提供打开/编辑指定图文的机制。也就是说，你们完全可以把秀米作为最终编辑器，而不是自己重造一个排版器。
+
+### 一、过去的推送到底怎么“读”
+
+这里我建议区分两个来源。
+
+如果是**你们自己学生会以前的推送**，最优方案不是去爬公众号，而是第一期先做一次“历史数据导入”。你们把过去 50～200 篇比较有代表性的推送导出来，保存：
+
+```text
+Article
+├── title              标题
+├── publish_date       发布时间
+├── event_type         活动类型
+├── department         部门
+├── text               纯文本
+├── html               原始排版 HTML
+├── images[]           图片
+├── cover              封面
+├── tags[]             招新/讲座/比赛/晚会...
+└── quality            是否为优秀案例
+```
+
+这里特别重要的是：**text 和 html 要同时保存。**
+
+因为：
+
+```text
+text → 给 LLM 学“怎么写”
+html → 给系统学“怎么排”
+```
+
+不要把两件事混在一起。
+
+例如历史文章可能是：
+
+```html
+<section style="...">
+   <section style="...">
+      <strong>活动介绍</strong>
+   </section>
+   <p>春风有信，花开有期……</p>
+</section>
+```
+
+你们解析后应该得到两个层次：
+
+```text
+内容层
+
+标题：
+春日来信｜XXX活动等你参加
+
+导语：
+春风有信，花开有期……
+
+Section 1:
+活动介绍
+
+Section 2:
+活动时间
+
+Section 3:
+活动地点
+
+Section 4:
+报名方式
+```
+
+以及：
+
+```text
+样式层
+
+Template: Campus_Fresh_01
+
+title_style
+section_title_style
+paragraph_style
+image_style
+quote_style
+footer_style
+```
+
+这样 Agent 才真正可控。
+
+---
+
+### 二、不要让 AI 直接生成一大坨秀米 HTML
+
+这是我特别建议你们避免的。
+
+理论上可以 prompt：
+
+> “请生成符合秀米格式的 HTML。”
+
+但生产环境很容易出现各种 `<section>` 嵌套、CSS、图片尺寸、微信兼容性问题。
+
+更好的架构是：
+
+```text
+               用户输入
+                  │
+                  ▼
+            活动信息提取
+                  │
+                  ▼
+         历史相似推送检索
+                  │
+          ┌───────┴───────┐
+          ▼               ▼
+       文案参考          风格参考
+          │               │
+          └───────┬───────┘
+                  ▼
+                LLM
+                  │
+                  ▼
+          Article JSON
+                  │
+                  ▼
+           Template Engine
+                  │
+                  ▼
+            Xiumi HTML
+                  │
+                  ▼
+               秀米
+                  │
+                  ▼
+             人工修改
+                  │
+                  ▼
+              公众号
+```
+
+LLM 只输出结构化内容，例如：
+
+```json
+{
+  "title": "秋日来信｜XXX活动等你参加",
+  "summary": "这个秋天，我们想邀请你……",
+  "sections": [
+    {
+      "type": "intro",
+      "text": "秋风渐起……"
+    },
+    {
+      "type": "event_info",
+      "title": "活动信息",
+      "items": {
+        "时间": "10月20日 19:00",
+        "地点": "大学生活动中心",
+        "对象": "全体学生"
+      }
+    },
+    {
+      "type": "body",
+      "title": "活动亮点",
+      "paragraphs": []
+    },
+    {
+      "type": "signup",
+      "title": "报名方式",
+      "qrcode": "xxx"
+    }
+  ]
+}
+```
+
+然后你们自己的 Renderer 再把 JSON 变成秀米/微信公众号兼容的 HTML。
+
+**这一步把 AI 和排版彻底解耦。**
+
+---
+
+### 三、历史推送也不一定需要上复杂 RAG
+
+如果 MVP 就几十/一两百篇文章，我甚至建议第一版先别急着搞复杂向量数据库。
+
+先给每篇历史文章做一个 LLM 摘要：
+
+```json
+{
+  "event_type": "讲座",
+  "audience": ["本科生"],
+  "purpose": ["预热", "报名"],
+  "tone": ["青春", "轻松", "校园"],
+  "structure": [
+    "情绪化开场",
+    "活动背景",
+    "嘉宾介绍",
+    "活动亮点",
+    "时间地点",
+    "报名二维码"
+  ],
+  "visual_style": "blue_minimal",
+  "quality_score": 4.5
+}
+```
+
+用户输入：
+
+> “我要做一个AI职业规划讲座的预热推送。”
+
+系统先检索：
+
+```text
+event_type = 讲座
+purpose = 预热
+audience ≈ 大学生
+```
+
+找到过去 3～5 篇最接近的优秀文章。
+
+再把这些文章作为 few-shot example 给模型。
+
+数据量大到几百、几千篇之后，再加入 embedding + pgvector。
+
+---
+
+### 四、秀米这部分其实有一个很有意思的实现方式
+
+秀米官方的“图文同步接口”文档明确描述了第三方平台与秀米用户绑定、打开图文、接收图文 HTML、接收图文图片等机制。同步时，秀米可以把文章 `title / summary / description(HTML) / picurl` 等传到你们服务器，而且图片会单独上传。
+
+url秀米图文同步接口文档
+
+所以我反而建议你们利用它做一个非常聪明的闭环：
+
+```text
+第一次：
+
+学生会成员
+   ↓
+在秀米制作一篇“标准模板”
+   ↓
+同步到你们 Agent
+   ↓
+你们获得
+HTML + Images
+   ↓
+解析成 Template
+```
+
+于是以后：
+
+```text
+活动信息
+   ↓
+AI 写文案
+   ↓
+选择历史模板
+   ↓
+Renderer 替换模板内容
+   ↓
+生成 HTML
+   ↓
+进入秀米继续编辑
+```
+
+而且秀米官方文档还提供了“新建或打开图文”的入口机制，可以通过 `article_id` 打开已有图文继续编辑。
+
+这就非常适合你们 Agent 的产品形态。
+
+最终用户看到的甚至可以是：
+
+```text
+━━━━━━━━━━━━━━━━━━━━━━
+       推送 Agent
+
+活动：AI职业规划分享会
+
+参考风格：
+● 2025职业规划讲座
+○ 2025校友分享会
+○ 2024就业经验分享会
+
+文案风格：
+● 学生会官方
+○ 活泼
+○ 正式
+○ 简洁
+
+排版模板：
+● 蓝白学术
+○ 青春渐变
+○ 极简黑白
+
+[ 生成推送 ]
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+AI 已生成
+
+标题：
+AI时代，我们该如何规划自己的未来？
+
+预计阅读时间：3 min
+
+[预览]
+[重新生成文案]
+[更换排版]
+[进入秀米编辑]
+━━━━━━━━━━━━━━━━━━━━━━
+```
+
+这个 Demo 已经会非常有说服力。
+
+---
+
+### 五、那“公众号文章现在能不能爬”？
+
+这里需要稍微谨慎一点。
+
+**技术上，公开公众号文章页面当然存在 HTML，可以对单篇公开页面进行解析；但不建议把“批量爬微信公众号历史文章”作为你们系统的核心数据获取方案。**
+
+尤其不要把整个项目设计成：
+
+```text
+公众号ID
+↓
+自动获取全部历史文章
+↓
+疯狂爬 mp.weixin.qq.com
+```
+
+这种方式长期稳定性、访问限制、账号风控、版权/使用授权等都会成为问题。对于别人的公众号文章，还涉及内容版权和数据使用边界。
+
+对于**自己学生会的公众号**，更推荐按优先级：
+
+```text
+1. 自己已有的秀米历史稿件
+        ↓
+2. 学生会保存的 HTML / Word / 素材
+        ↓
+3. 自己公众号后台能够合法导出的数据/素材
+        ↓
+4. 已知公开文章 URL → 单篇导入
+        ↓
+5. 才考虑自动化采集
+```
+
+如果用户直接粘一个：
+
+```text
+https://mp.weixin.qq.com/s/xxxx
+```
+
+你们 Agent 做一个：
+
+> **“导入历史推送”**
+
+然后解析这篇公开文章，作为用户主动提供的数据源，这种产品设计要比做“大规模公众号爬虫”干净得多。
+
+另外，秀米自己的说明也明确提醒：模板的排版样式和文案内容是两回事，直接原样使用别人的文案会涉及原创保护；模板素材本身也有相应版权规则。
+
+---
+
+### 六、海报 Agent 可以和推送 Agent 共用同一份信息
+
+这一点会让你们的 MVP 突然很完整。
+
+不要做：
+
+```text
+推送 Agent
+海报 Agent
+```
+
+两个互不相干的机器人。
+
+应该做一个：
+
+```text
+                 Event Brief
+                     │
+       ┌─────────────┼─────────────┐
+       ▼             ▼             ▼
+   推送 Agent      海报 Agent      社群文案
+       │             │             │
+       ▼             ▼             ▼
+    秀米HTML       Poster        微信群通知
+```
+
+例如活动资料只有：
+
+```text
+活动：AI时代职业规划分享会
+时间：10月20日 19:00
+地点：大学生活动中心
+嘉宾：XXX
+主题：AI时代大学生如何进行职业规划
+报名二维码：xxx.png
+```
+
+推送 Agent 自动扩展成完整文章。
+
+海报 Agent 则把同一个 Event Brief 转成：
+
+```json
+{
+  "headline": "AI时代，你准备好了吗？",
+  "subtitle": "大学生职业规划分享会",
+  "date": "10.20",
+  "time": "19:00",
+  "location": "大学生活动中心",
+  "speaker": "XXX",
+  "cta": "扫码报名",
+  "visual_keywords": [
+    "AI",
+    "future",
+    "career",
+    "technology"
+  ]
+}
+```
+
+再进入固定海报模板或图像生成模型。
+
+这样就保证**海报、推送、群通知里的时间地点永远来自同一个 Event Brief**，不会 AI 写着写着一个变成 19:00、另一个变成 19:30。
+
+---
+
+### 七、如果是你们现在要开始写，我会把 MVP 压得很小
+
+第一阶段只做这一条：
+
+**历史推送导入 → 自动解析 → 建立 10 个左右“优秀推送模板” → 输入活动 Brief → 找 3 篇历史相似文章 → LLM 生成结构化推送 → 套秀米 HTML → 人工进入秀米修改 → 同一个 Brief 自动生成海报。**
+
+技术上：
+
+```text
+Next.js
+   │
+FastAPI
+   │
+   ├── PostgreSQL
+   │
+   ├── OpenAI API
+   │
+   ├── Article Parser
+   │
+   ├── Template Renderer
+   │
+   └── Poster Renderer / Image Model
+            │
+            ▼
+          秀米
+            │
+            ▼
+         微信公众号
+```
+
+这样第一版甚至 **2～3个人就能做**，而且重点不是“Agent 技术多复杂”，而是你们可以展示一个非常清楚的效果：
+
+> **原本宣传部做一次活动，需要找往期推送 → 写文案 → 找模板 → 排秀米 → 做海报；现在只填一次活动信息，5分钟内生成一整套宣传初稿。**
+
+这就是一个很好的 MVP。
+
+
+【提问 轮数3】
+从我们自己的公众号上的推送可以提取出文案和推送吗 原始的秀米可能都在不同的人那里
+
+【回答内容 轮数3】
+可以，而且**原始秀米散落在历届同学账号里，并不会阻止你们做第一版**。
+
+因为文章一旦已经发布到你们自己的公众号，公众号文章页面本身就已经包含了相当多的最终成品信息。你们可以把**公众号上的已发布文章当成历史数据库的主要来源**，而不是强依赖原始秀米工程。
+
+### 能从已发布公众号文章恢复什么？
+
+假设你们有一篇历史文章：
+
+```text
+https://mp.weixin.qq.com/s/xxxxx
+```
+
+从最终发布页面，可以考虑提取并保存三层信息：
+
+| 数据 | 能否恢复 | 用途 |
+|---|---|---|
+| 标题、正文文案 | ✅ | 学习写作风格 |
+| 小标题、段落结构 | ✅ | 学习文章结构 |
+| 正文图片 | ✅ 大部分 | 建素材库/风格参考 |
+| 封面等元信息 | 部分可获得 | 风格分析 |
+| HTML/CSS 排版 | ✅ 相当一部分 | 恢复排版模板 |
+| 原始秀米项目 | ❌ | 已发布页面无法反推原项目 |
+| 秀米内部组件/编辑状态 | ❌ | 最终页面里已经“编译”掉了 |
+
+所以可以把它理解成：
+
+```text
+原始秀米工程
+    ↓
+排版
+    ↓
+微信公众号文章 HTML
+    ↓
+最终公众号文章
+
+你们现在没有 ↑
+但拥有这一层 ↑
+```
+
+**对于训练/构建推送 Agent 来说，最终公众号 HTML 其实已经够用了。**
+
+原始秀米最大的价值是“方便重新编辑”，不是“让 AI 学习”。
+
+---
+
+## 我反而建议你们做一个“历史公众号迁移器”
+
+第一次初始化系统时，让管理员把自己公众号过去的文章批量/半自动导入。
+
+整个 ETL：
+
+```text
+        自己公众号历史文章
+                │
+                ▼
+          Article Importer
+                │
+        ┌───────┼─────────┐
+        ▼       ▼         ▼
+      HTML     图片      Metadata
+        │       │
+        ▼       ▼
+     Parser   Storage
+        │
+        ▼
+ ┌─────────────────────────┐
+ │     Article Database     │
+ ├─────────────────────────┤
+ │ 原始 HTML                │
+ │ 清洗 HTML                │
+ │ 纯文本                   │
+ │ 图片                     │
+ │ 标题                     │
+ │ 日期                     │
+ │ 作者                     │
+ │ 文章结构                 │
+ │ 活动类型                 │
+ │ 文案风格                 │
+ │ 排版风格                 │
+ └─────────────────────────┘
+```
+
+然后再让 AI 做第二次处理。
+
+例如原文：
+
+```text
+       青春正当时
+      ✦  ✦  ✦
+
+   春风有信，花开有期
+   在这个充满希望的春天
+   我们与你相约……
+
+     — 活动介绍 —
+
+      [活动图片]
+
+      — 活动时间 —
+
+    2026年3月21日
+```
+
+LLM 不需要看到那些乱七八糟的 HTML。
+
+Parser 先整理成：
+
+```json
+{
+  "title": "青春正当时",
+  "type": "活动预热",
+  "structure": [
+    {
+      "type": "intro",
+      "content": "春风有信，花开有期……"
+    },
+    {
+      "type": "section",
+      "title": "活动介绍"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "section",
+      "title": "活动时间",
+      "content": "2026年3月21日"
+    }
+  ]
+}
+```
+
+这样你们就获得了非常干净的训练/RAG 数据。
+
+---
+
+## 更妙的是：排版也可以“逆向模板化”
+
+你们其实不用执着于：
+
+> “这篇文章原来是哪个秀米模板？”
+
+你们真正需要知道的是：
+
+> “这篇最终文章长什么样？”
+
+例如历史文章 HTML 可能有几十层 `<section>`。
+
+系统分析之后，把它归类：
+
+```text
+Template #07
+
+类型：活动预热
+风格：青春 / 清新
+主色：绿色
+标题：居中大标题
+小标题：装饰性边框
+正文：两端对齐
+图片：圆角
+间距：24px
+
+结构：
+
+Hero
+ ↓
+Intro
+ ↓
+Section Title
+ ↓
+Paragraph
+ ↓
+Image
+ ↓
+Section Title
+ ↓
+Event Info
+ ↓
+QR Code
+ ↓
+Footer
+```
+
+这样你们甚至可以发现：
+
+> 学生会过去5年做了300篇推送，但真正经常使用的视觉结构可能只有20～30种。
+
+那么 Agent 就只需要维护这 20～30 个 Template。
+
+---
+
+## 还有一个特别值得做的数据
+
+**把“文章”和“活动”关联起来。**
+
+例如过去公众号里：
+
+```text
+《与AI同行｜职业规划讲座重磅来袭》
+《活动回顾｜AI时代，我们如何规划未来》
+```
+
+AI 可以识别：
+
+```text
+Event #0037
+AI职业规划讲座
+
+├── Preheat Article
+│   └── 《与AI同行……》
+│
+└── Summary Article
+    └── 《活动回顾……》
+```
+
+这样以后有人说：
+
+> “我要办一个职业规划讲座。”
+
+你们检索出来的就不是随机的3篇公众号文章，而是：
+
+> 历史上办过哪些类似活动 → 当时预热怎么写 → 海报怎么做 → 最后总结怎么写。
+
+这个数据价值会高很多。
+
+---
+
+## 但有一个区别要注意：以后新文章最好把“源文件”收回来
+
+历史遗留问题没关系。
+
+从 Agent 上线以后，可以建立新的规范：
+
+```text
+过去
+公众号 ← 各个人的秀米
+          ↑
+        找不到了
+
+------------------
+
+以后
+
+             Agent Database
+             ↑          ↓
+         HTML/图片    Event数据
+             ↑          ↓
+学生 → Agent → 秀米 → 公众号
+             ↓
+       自动保存最终稿
+```
+
+秀米官方目前有“图文同步”接口，第三方平台可以接收秀米用户同步过来的**图文 HTML、标题、摘要、封面以及图文里的图片**。
+
+也就是说以后宣传部同学仍然可以：
+
+> **AI生成 → 秀米人工精修 → 一键同步回你们的 Agent → 发布**
+
+这样最终人工修改过的版本也回到你们数据库里。
+
+这非常关键，因为你们未来会自然积累：
+
+```text
+AI Draft
+   ↓
+学生修改
+   ↓
+Human Final
+```
+
+这恰恰是以后优化 Agent 最有价值的数据。
+
+---
+
+### 所以你们第一版的数据策略，我会定成这样
+
+**历史数据：**
+
+```text
+自己公众号已发布文章
+        ↓
+提取 HTML + 文案 + 图片
+        ↓
+AI 自动分类
+        ↓
+人工快速检查
+        ↓
+历史文章库
+```
+
+**未来数据：**
+
+```text
+Event Brief
+     ↓
+Agent
+     ↓
+AI Draft
+     ↓
+秀米编辑
+     ↓
+Human Final
+     ↓
+同步回 Agent Database
+     ↓
+公众号发布
+```
+
+这样**完全不用把历届同学的秀米账号一个个找回来**。
+
+而且从工程角度讲，我甚至认为这是更合理的数据架构：**公众号文章是历史最终版本（ground truth），散落的秀米稿件反而只是中间工程文件。**
+
+有一个技术细节我会提前提醒你们：**“读取自己公众号历史文章”这一层最好单独做成 Importer，不要让 Agent 本身负责爬网页。** Importer 负责获取、清洗、存储；Agent 永远只查你们自己的 Article Database。这样以后即使微信页面结构或获取方式发生变化，也不会影响整个 Agent。
+
+如果你愿意，我下一步可以直接给你们设计一下**“公众号历史推送 → 清洗 → RAG → 生成新推送 → 秀米”的具体技术方案**，包括数据库表怎么建、HTML 怎么解析、哪些东西用 LLM、哪些千万不要用 LLM。
+
+
+【提问 轮数4】
+先考虑从公众号提取到database的这一个部分 应该怎么实现
+
+【回答内容 轮数4】
+可以。这个阶段我建议先**完全不考虑 Agent/RAG/生成**，把目标收敛成一个非常清楚的数据工程任务：
+
+> **把自己公众号过去发布的文章，稳定地变成一个干净、可查询、可继续加工的 Article Database。**
+
+核心 pipeline 是：
+
+```text
+公众号历史文章
+      ↓
+① 获取文章 URL
+      ↓
+② 下载文章页面
+      ↓
+③ 解析 Metadata / HTML / Text / Images
+      ↓
+④ 清洗 HTML
+      ↓
+⑤ 图片本地化/对象存储
+      ↓
+⑥ 文章结构化
+      ↓
+⑦ PostgreSQL
+```
+
+其中真正需要先攻克的是 **① URL 从哪里来** 和 **② 微信页面能否稳定获取**。不要一开始就做“公众号名称 → 自动爬全部文章”。
+
+## 1. 第一版建议：URL 驱动的 Importer
+
+先做一个接口：
+
+```http
+POST /articles/import
+```
+
+输入一篇你们自己公众号的文章 URL，例如：
+
+```text
+mp.weixin.qq.com/s/xxxxxxxx
+```
+
+后台：
+
+```python
+import_article(url)
+    ↓
+fetch_wechat_page(url)
+    ↓
+parse_article(html)
+    ↓
+download_images()
+    ↓
+clean_html()
+    ↓
+save_database()
+```
+
+成功以后数据库得到：
+
+```json
+{
+  "source": "wechat",
+  "source_url": "...",
+  "title": "XXX活动圆满结束",
+  "account_name": "XX大学学生会",
+  "published_at": "...",
+  "content_text": "...",
+  "content_html": "...",
+  "images": [],
+  "status": "imported"
+}
+```
+
+如果这个最小闭环都不能稳定运行，就先不要考虑批量历史文章。
+
+---
+
+# 2. 数据库不要只建一个 articles 表
+
+我建议至少拆成三层。
+
+### `articles`
+
+保存文章本身：
+
+```sql
+CREATE TABLE articles (
+    id UUID PRIMARY KEY,
+
+    platform VARCHAR(30),        -- wechat
+    source_url TEXT UNIQUE,
+
+    account_name TEXT,
+    title TEXT,
+    author TEXT,
+
+    published_at TIMESTAMP,
+
+    raw_html TEXT,
+    clean_html TEXT,
+    plain_text TEXT,
+
+    cover_image_url TEXT,
+
+    import_status VARCHAR(30),
+
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+```
+
+这里三个字段千万别省：
+
+```text
+raw_html
+clean_html
+plain_text
+```
+
+因为未来分别有不同用途。
+
+`raw_html` 是原始档案，未来解析器升级了可以重新跑；`clean_html` 是恢复排版、提取秀米模板的基础；`plain_text` 则是以后搜索、Embedding、LLM/RAG 的基础。
+
+---
+
+### `article_images`
+
+图片单独存：
+
+```sql
+CREATE TABLE article_images (
+    id UUID PRIMARY KEY,
+
+    article_id UUID REFERENCES articles(id),
+
+    original_url TEXT,
+    storage_url TEXT,
+
+    image_index INT,
+
+    width INT,
+    height INT,
+
+    alt_text TEXT,
+
+    created_at TIMESTAMP
+);
+```
+
+例如：
+
+```text
+Article #123
+
+images
+├── 001.jpg    封面/头图
+├── 002.jpg    活动照片
+├── 003.jpg    嘉宾介绍
+├── 004.jpg    活动流程
+└── 005.jpg    二维码
+```
+
+**不要只保存微信图片 URL。**
+
+最好下载到你们自己的 OSS / S3 / MinIO。
+
+否则未来微信 CDN URL 变化、鉴权变化或者资源失效，你们历史数据就残缺了。
+
+---
+
+### `article_blocks`
+
+这个是我最建议提前设计的。
+
+把文章拆成 Block：
+
+```sql
+CREATE TABLE article_blocks (
+    id UUID PRIMARY KEY,
+
+    article_id UUID REFERENCES articles(id),
+
+    block_index INT,
+
+    block_type VARCHAR(50),
+
+    text_content TEXT,
+    html_content TEXT,
+
+    image_id UUID,
+
+    metadata JSONB
+);
+```
+
+最终一篇文章可能变成：
+
+```text
+Article
+│
+├─ 0  heading
+│      "青春正当时"
+│
+├─ 1  paragraph
+│      "春风有信，花开有期……"
+│
+├─ 2  image
+│      image_001
+│
+├─ 3  heading
+│      "活动介绍"
+│
+├─ 4  paragraph
+│      "为了进一步……"
+│
+├─ 5  image
+│
+├─ 6  heading
+│      "活动时间"
+│
+└─ 7  paragraph
+       "10月20日 19:00"
+```
+
+以后 Agent 基本就是吃这一层。
+
+---
+
+# 3. HTML 解析怎么做
+
+技术栈很普通：
+
+```text
+Python
++
+requests/httpx
++
+BeautifulSoup / lxml
+```
+
+假设已经成功获取文章 HTML：
+
+```python
+from bs4 import BeautifulSoup
+
+def parse_wechat_article(html):
+    soup = BeautifulSoup(html, "lxml")
+
+    content = soup.select_one("#js_content")
+
+    if not content:
+        raise ValueError("Article content not found")
+
+    return {
+        "text": content.get_text(
+            "\n",
+            strip=True
+        ),
+        "html": str(content)
+    }
+```
+
+微信公众号历史上正文通常围绕类似 `#js_content` 的 DOM 结构，但**不要把某个 selector 当成永久 API**。微信页面结构可以变化，所以应该写成独立 parser：
+
+```text
+WechatParserV1
+WechatParserV2
+...
+```
+
+而不是把 selector 散落在整个项目里。
+
+---
+
+# 4. 图片处理比文本复杂一点
+
+公众号 HTML 里的图片经常不是简单的：
+
+```html
+<img src="xxx">
+```
+
+还可能存在懒加载相关属性。
+
+所以 parser 应该检查：
+
+```python
+def extract_image_url(img):
+    return (
+        img.get("data-src")
+        or img.get("src")
+    )
+```
+
+然后：
+
+```text
+微信图片 URL
+    ↓
+download
+    ↓
+计算 SHA256
+    ↓
+判断是否重复
+    ↓
+保存 OSS/S3
+    ↓
+替换 HTML URL
+```
+
+比如原来：
+
+```html
+<img data-src="微信CDN地址">
+```
+
+处理后变：
+
+```html
+<img src="https://your-storage/.../abc.jpg">
+```
+
+这样你们保存的 `clean_html` 就不再依赖微信图片 CDN。
+
+还建议保存：
+
+```text
+sha256
+mime_type
+width
+height
+file_size
+```
+
+未来做海报 Agent 的时候，这个历史图片库会非常有价值。
+
+---
+
+# 5. HTML 清洗千万不要“清得太干净”
+
+这个坑很容易踩。
+
+很多网页爬虫会：
+
+```text
+HTML
+↓
+BeautifulSoup
+↓
+get_text()
+```
+
+然后 HTML 扔掉。
+
+对于你们这个项目，这是**损失巨大**。
+
+因为你们未来不仅想知道：
+
+> “以前写了什么？”
+
+还想知道：
+
+> “以前怎么排版？”
+
+例如：
+
+```html
+<section style="
+    text-align:center;
+    margin:20px 0;
+">
+    <span style="
+        font-size:18px;
+        font-weight:bold;
+    ">
+        活动介绍
+    </span>
+</section>
+```
+
+这些 inline CSS 正是以后分析秀米排版的重要信息。
+
+所以应该：
+
+```text
+RAW HTML
+    │
+    ├──────────────→ Archive
+    │
+    ▼
+Sanitize
+    │
+    ├─ 删除 script
+    ├─ 删除 tracking
+    ├─ 删除无关页面元素
+    ├─ 图片URL本地化
+    │
+    └─ 尽量保留正文 inline style
+            ↓
+        clean_html
+```
+
+不要上来就：
+
+```text
+style=""
+```
+
+全部删除。
+
+---
+
+# 6. Block Parser 第一版不要用 AI
+
+比如：
+
+```html
+<section>
+   ...
+   <p>活动介绍</p>
+   ...
+   <img>
+   ...
+   <p>欢迎同学们积极参与！</p>
+</section>
+```
+
+先通过 DOM Tree 转换：
+
+```text
+DOM
+ ↓
+Block parser
+ ↓
+heading
+paragraph
+image
+divider
+quote
+unknown
+```
+
+这里可以用规则判断：
+
+```python
+if tag.name == "img":
+    type = "image"
+
+elif large_font and centered:
+    type = "heading"
+
+elif tag.name in ["p", "span"]:
+    type = "paragraph"
+```
+
+第一版判断不出来：
+
+```text
+block_type = unknown
+```
+
+完全没问题。
+
+**宁可保存原始信息，也不要让 LLM 猜。**
+
+等后面再跑 AI enrichment：
+
+```text
+"活动时间"
+    ↓
+LLM
+    ↓
+semantic_type = event_time_heading
+```
+
+这是第二阶段。
+
+---
+
+# 7. 获取“全部历史文章 URL”要和文章解析解耦
+
+这是整个工程里最重要的架构设计之一。
+
+不要写：
+
+```python
+crawl_official_account()
+```
+
+里面既找文章、又爬文章、又解析、又存数据库。
+
+应该拆：
+
+```text
+        URL Discovery
+             ↓
+       Article Queue
+             ↓
+         Fetcher
+             ↓
+          Parser
+             ↓
+       Asset Downloader
+             ↓
+        Normalizer
+             ↓
+          Database
+```
+
+例如 queue：
+
+```text
+URL                              STATUS
+
+mp.weixin.qq.../AAA              DONE
+mp.weixin.qq.../BBB              DONE
+mp.weixin.qq.../CCC              FETCHING
+mp.weixin.qq.../DDD              FAILED
+mp.weixin.qq.../EEE              PENDING
+```
+
+于是将来无论 URL 来源是：
+
+```text
+人工粘贴
+Excel 导入
+公众号后台
+官方接口
+历史文档
+其他合法数据源
+```
+
+后面的 pipeline **完全不用改**。
+
+---
+
+# 8. 批量抓取一定要做 Queue
+
+不要：
+
+```python
+for url in 3000_urls:
+    requests.get(url)
+```
+
+生产上应该：
+
+```text
+URLs
+ ↓
+Redis Queue
+ ↓
+Worker
+ ├── Fetch
+ ├── Retry
+ ├── Parse
+ ├── Images
+ └── Save
+```
+
+技术上可以用：
+
+```text
+FastAPI
+PostgreSQL
+Redis
+Celery / Dramatiq
+S3 / OSS / MinIO
+BeautifulSoup + lxml
+```
+
+如果只有几百篇，Celery 都不是必须的。一个简单后台 worker 就能跑。
+
+---
+
+# 9. 加一个非常重要的 `raw snapshot`
+
+我会额外建：
+
+```text
+article_snapshots
+```
+
+保存：
+
+```text
+source_url
+fetched_at
+http_status
+raw_response
+parser_version
+parse_status
+error_message
+```
+
+因为假设半年后你发现：
+
+> “卧槽，我们第一版 parser 把秀米的小标题样式解析错了。”
+
+如果你只保存处理后的结果，就得重新访问所有微信文章。
+
+但如果保留 raw snapshot：
+
+```text
+原始网页
+  ↓
+Parser V1 → 老数据库
+  ↓
+Parser V2 → 新数据库
+```
+
+直接离线重跑。
+
+这个设计成本很低，但是以后非常省命。
+
+---
+
+# 10. 第一阶段甚至先别碰“自动获取全公众号”
+
+我建议你们按照这个开发顺序：
+
+**Sprint 1：**
+
+```text
+输入：
+一条公众号 URL
+
+输出：
+title
+date
+text
+html
+images
+```
+
+先验证 20 篇你们自己的历史文章。
+
+↓
+
+**Sprint 2：**
+
+验证不同年份：
+
+```text
+2022文章
+2023文章
+2024文章
+2025文章
+2026文章
+```
+
+尤其找不同排版风格的。
+
+↓
+
+**Sprint 3：**
+
+实现：
+
+```text
+URL CSV
+↓
+批量 Import
+↓
+Database
+```
+
+一次输入 100 个 URL。
+
+↓
+
+**Sprint 4：**
+
+做 Block Parser：
+
+```text
+HTML
+↓
+heading / text / image
+```
+
+↓
+
+**Sprint 5：**
+
+最后才研究：
+
+> 如何合法、稳定地获得自己公众号完整历史文章列表。
+
+这样即使最后“自动获取历史列表”这一层受到微信接口权限或页面策略限制，你们前面 90% 的工程仍然是可用的。
+
+---
+
+## 最终数据库我会设计成这样
+
+```text
+OfficialAccount
+      │
+      │ 1:N
+      ▼
+   Article
+ ┌───────────────┐
+ │ title         │
+ │ source_url    │
+ │ published_at  │
+ │ raw_html      │
+ │ clean_html    │
+ │ plain_text    │
+ └───────┬───────┘
+         │
+    ┌────┴─────────────┐
+    │                  │
+    ▼                  ▼
+ArticleBlock        ArticleImage
+    │                  │
+ heading              url
+ paragraph            storage_path
+ image                sha256
+ quote                width
+ divider              height
+    │
+    ▼
+以后做 RAG
+```
+
+旁边再保留：
+
+```text
+ArticleSnapshot
+      │
+      ├── raw response
+      ├── fetched_at
+      ├── parser_version
+      └── errors
+```
+
+**这就是你们第一阶段真正值得做好的基础设施。**
+
+有一点需要修正我前面说得比较宽泛的地方：**“从单篇公开文章 URL 解析内容”与“自动枚举并批量获取公众号全部历史文章”是两个不同问题。** 后者是否能通过官方能力完成，会受公众号类型、权限以及微信当前接口能力影响；不要默认存在一个稳定的“输入公众号 ID 就拿到所有历史文章”的公开接口。我刚才尝试核对微信官方开发文档，但搜索没有返回可靠的官方结果，因此这里不想给你编一个接口名称。
+
+如果你们现在准备真正开始 coding，下一步最有价值的是我可以直接给你们写出 **`wechat-importer` 的项目目录 + PostgreSQL schema + `import_article()` Python 实现骨架**，你们拿过去基本就可以开始跑第一篇公众号文章。
