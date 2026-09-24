@@ -36,6 +36,15 @@
     .connection.offline .dot { background:#e59c35; }
     .notice { display:none; margin:16px auto 0; width:min(820px,calc(100% - 36px)); background:#fff8e9; color:#765322; border:1px solid #f1dfb6; border-radius:10px; padding:11px 14px; font-size:13px; }
     .notice.visible { display:block; }
+    .access-gate { position:fixed; inset:0; z-index:20; display:none; place-items:center; padding:20px; background:#eef2f9ee; }
+    .access-gate.visible { display:grid; }
+    .access-card { width:min(390px,100%); padding:24px; border:1px solid var(--line); border-radius:16px; background:#fff; box-shadow:0 18px 55px #25314220; }
+    .access-card h2 { margin:0 0 7px; font-size:20px; }
+    .access-card p { margin:0 0 15px; color:var(--muted); font-size:13px; }
+    .access-card form { display:flex; gap:8px; }
+    .access-card input { flex:1; min-width:0; border:1px solid #dce2eb; border-radius:9px; padding:9px 10px; font:inherit; }
+    .access-card button { border:0; border-radius:9px; background:var(--blue); color:#fff; padding:9px 14px; }
+    .access-error { min-height:20px; margin-top:9px; color:#b14a3b; font-size:12px; }
     .scroll { flex:1; overflow:auto; padding:24px 20px; }
     .conversation { width:min(820px,100%); margin:0 auto; }
     .welcome { text-align:center; padding:12vh 10px 26px; }
@@ -98,6 +107,17 @@
   </style>
 </head>
 <body>
+  <div class="access-gate" id="accessGate">
+    <div class="access-card">
+      <h2>输入共享访问码</h2>
+      <p>这是一个由本地电脑提供的共享页面。访问码只用于验证页面权限，AI API 密钥不会发送给浏览器。</p>
+      <form id="accessForm">
+        <input id="accessCode" type="password" autocomplete="current-password" placeholder="共享访问码" required>
+        <button type="submit">进入</button>
+      </form>
+      <div class="access-error" id="accessError"></div>
+    </div>
+  </div>
   <div class="shell">
     <aside>
       <div class="brand"><div class="logo">档</div><div><strong>推送档案助手</strong><span>从过往文章中找经验</span></div></div>
@@ -416,12 +436,19 @@
         : '可选择首图、正文图、尾图；图片会嵌入导出的 HTML。';
     });
 
-    fetch('/api/status').then(r => r.json()).then(status => {
+    async function loadStatus() {
+      const response = await fetch('/api/status');
+      const status = await response.json();
+      if (response.status === 401 && status.auth_required) {
+        document.getElementById('accessGate').classList.add('visible');
+        document.getElementById('accessCode').focus();
+        return;
+      }
       document.getElementById('articleCount').textContent = `${status.article_count} 篇`;
       document.getElementById('modelPill').textContent = `${status.model} · ${status.reasoning_effort}`;
       if (status.api_key_configured) {
         const provider = (status.api_provider || '').includes('aizex') ? 'Aizex API' : '模型 API';
-        document.getElementById('connectionText').textContent = `${provider} 已配置`;
+        document.getElementById('connectionText').textContent = status.auth_enabled ? `${provider} · 共享已保护` : `${provider} 已配置`;
       } else {
         const connection = document.getElementById('connection');
         connection.classList.add('offline');
@@ -430,7 +457,28 @@
         notice.textContent = '聊天页面和本地文章检索已就绪。填写根目录 .env 文件中的 OPENAI_API_KEY 并重启后，即可调用 GPT-6 Sol。密钥不会发给浏览器。';
         notice.classList.add('visible');
       }
-    }).catch(() => {
+    }
+
+    document.getElementById('accessForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const error = document.getElementById('accessError');
+      error.textContent = '正在验证…';
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({access_code: document.getElementById('accessCode').value})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || '访问码不正确');
+        document.getElementById('accessGate').classList.remove('visible');
+        error.textContent = '';
+        await loadStatus();
+      } catch (loginError) {
+        error.textContent = loginError.message;
+      }
+    });
+
+    loadStatus().catch(() => {
       document.getElementById('connectionText').textContent = '本地服务未就绪';
     });
   </script>

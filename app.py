@@ -11,12 +11,14 @@ import binascii
 import json
 import mimetypes
 import time
+import secrets
 from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
@@ -42,6 +44,9 @@ MODEL_FALLBACK = os.getenv("OPENAI_MODEL_FALLBACK", "gpt-6-luna")
 REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "high")
 API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 BASE_URL = os.getenv("OPENAI_BASE_URL", "").strip()
+APP_ACCESS_CODE = os.getenv("APP_ACCESS_CODE", "").strip()
+ACCESS_COOKIE = "coe_access"
+_ACCESS_SESSIONS: set[str] = set()
 _MODEL_LOCK = threading.Lock()
 
 app = FastAPI(title="学生会推送档案助手", version="0.1.0")
@@ -52,6 +57,24 @@ app.mount("/generated-images", StaticFiles(directory=GENERATED_IMAGE_DIR, check_
 app.mount("/assets", StaticFiles(directory=ASSET_DIR, check_dir=False), name="assets")
 
 
+@app.middleware("http")
+async def shared_access_middleware(request: Request, call_next):
+    """Protect shared API, database and media routes with a server-side access code."""
+    if not APP_ACCESS_CODE:
+        return await call_next(request)
+    path = request.url.path
+    public_paths = {"/", "/api/login", "/api/status", "/favicon.ico"}
+    if path in public_paths:
+        return await call_next(request)
+    cookie = request.cookies.get(ACCESS_COOKIE, "")
+    if not cookie or cookie not in _ACCESS_SESSIONS:
+        return JSONResponse(
+            status_code=401,
+            content={"detail": "请输入共享访问码。", "auth_required": True},
+        )
+    return await call_next(request)
+
+
 class ChatTurn(BaseModel):
     role: Literal["user", "assistant"]
     content: str = Field(max_length=3000)
@@ -60,6 +83,10 @@ class ChatTurn(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     history: list[ChatTurn] = Field(default_factory=list, max_length=10)
+
+
+class AccessRequest(BaseModel):
+    access_code: str = Field(min_length=1, max_length=200)
 
 
 class PushRequest(BaseModel):
@@ -483,6 +510,34 @@ def home() -> FileResponse:
     return FileResponse(WEB_DIR / "index.html")
 
 
+@app.post("/api/login")
+def login(payload: AccessRequest):
+    if not APP_ACCESS_CODE:
+        return {"authenticated": True, "auth_enabled": False}
+    if not secrets.compare_digest(payload.access_code.strip(), APP_ACCESS_CODE):
+        raise HTTPException(status_code=401, detail="访问码不正确，请向网站提供者索取访问码。")
+    session = secrets.token_urlsafe(32)
+    _ACCESS_SESSIONS.add(session)
+    response = JSONResponse({"authenticated": True, "auth_enabled": True})
+    response.set_cookie(
+        ACCESS_COOKIE,
+        session,
+        httponly=True,
+        samesite="lax",
+        max_age=86400,
+    )
+    return response
+
+
+@app.post("/api/logout")
+def logout(request: Request):
+    session = request.cookies.get(ACCESS_COOKIE, "")
+    _ACCESS_SESSIONS.discard(session)
+    response = JSONResponse({"authenticated": False})
+    response.delete_cookie(ACCESS_COOKIE)
+    return response
+
+
 @app.get("/api/status")
 def status() -> dict:
     count = 0
@@ -497,6 +552,7 @@ def status() -> dict:
         "fallback_model": MODEL_FALLBACK,
         "api_provider": urlsplit(BASE_URL).hostname if BASE_URL else "api.openai.com",
         "article_count": count,
+        "auth_enabled": bool(APP_ACCESS_CODE),
     }
 
 
