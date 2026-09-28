@@ -11,18 +11,16 @@ import binascii
 import json
 import mimetypes
 import time
-import secrets
 import uuid
 import io
 import zipfile
 import xml.etree.ElementTree as ET
+from types import SimpleNamespace
 from pathlib import Path
 from typing import Literal
-from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
@@ -51,21 +49,24 @@ GUIDELINES_PATH = ROOT / "推送Agent最高层指示.md"
 PUSH_GUIDELINE_SOURCE_URL = "https://mp.weixin.qq.com/s/4wF6gq3Mq_vwgBxTB2I6Ig"
 load_dotenv(ROOT / ".env")
 
-MODEL = os.getenv("OPENAI_MODEL", "gpt-6-sol")
-MODEL_FALLBACK = os.getenv("OPENAI_MODEL_FALLBACK", "gpt-6-sol")
+# Each clone keeps its own provider settings in .env.  Legacy OPENAI_* names
+# remain supported for existing installations.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "").strip().lower() or ("aizex" if "aizex" in os.getenv("OPENAI_BASE_URL", "").lower() else "openai")
+LLM_API_MODE = os.getenv("LLM_API_MODE", "auto").strip().lower()
+API_KEY = os.getenv("LLM_API_KEY", "").strip() or os.getenv("OPENAI_API_KEY", "").strip()
+BASE_URL = os.getenv("LLM_BASE_URL", "").strip() or os.getenv("OPENAI_BASE_URL", "").strip()
+if not BASE_URL:
+    BASE_URL = {"openai": "https://api.openai.com/v1", "deepseek": "https://api.deepseek.com/v1", "glm": "https://open.bigmodel.cn/api/paas/v4", "aizex": "https://codex-api.aizex.net/v1"}.get(LLM_PROVIDER, "https://api.openai.com/v1")
+MODEL = os.getenv("LLM_MODEL", "").strip() or os.getenv("OPENAI_MODEL", "gpt-6-sol")
+MODEL_FALLBACK = os.getenv("LLM_MODEL_FALLBACK", "").strip() or os.getenv("OPENAI_MODEL_FALLBACK", MODEL)
 # Luna is temporarily unavailable in the current provider account.  Keep the
 # role name in the workflow manifest, but execute that role with Sol at low
 # reasoning effort until Luna access is restored.
-MODEL_LUNA = os.getenv("OPENAI_MODEL_LUNA", "gpt-6-sol")
-MODEL_SOL = os.getenv("OPENAI_MODEL_SOL", "gpt-6-sol")
+MODEL_LUNA = os.getenv("LLM_MODEL_LUNA", "").strip() or os.getenv("OPENAI_MODEL_LUNA", MODEL)
+MODEL_SOL = os.getenv("LLM_MODEL_SOL", "").strip() or os.getenv("OPENAI_MODEL_SOL", MODEL)
 REASONING_EFFORT = os.getenv("OPENAI_REASONING_EFFORT", "high")
 REASONING_LUNA = os.getenv("OPENAI_REASONING_LUNA", "low")
 REASONING_SOL = os.getenv("OPENAI_REASONING_SOL", "high")
-API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-BASE_URL = os.getenv("OPENAI_BASE_URL", "").strip()
-APP_ACCESS_CODE = os.getenv("APP_ACCESS_CODE", "").strip()
-ACCESS_COOKIE = "coe_access"
-_ACCESS_SESSIONS: set[str] = set()
 _MODEL_LOCK = threading.Lock()
 
 app = FastAPI(title="学生会推送档案助手", version="0.1.0")
@@ -78,19 +79,7 @@ app.mount("/assets", StaticFiles(directory=ASSET_DIR, check_dir=False), name="as
 
 @app.middleware("http")
 async def shared_access_middleware(request: Request, call_next):
-    """Protect shared API, database and media routes with a server-side access code."""
-    if not APP_ACCESS_CODE:
-        return await call_next(request)
-    path = request.url.path
-    public_paths = {"/", "/api/login", "/api/status", "/favicon.ico"}
-    if path in public_paths:
-        return await call_next(request)
-    cookie = request.cookies.get(ACCESS_COOKIE, "")
-    if not cookie or cookie not in _ACCESS_SESSIONS:
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "请输入共享访问码。", "auth_required": True},
-        )
+    """The repository is private; clones authenticate to their own provider."""
     return await call_next(request)
 
 
@@ -295,16 +284,61 @@ def search_archive(query: str, limit: int = 6, exclude_urls: set[str] | None = N
     return results
 
 
+def effective_api_mode() -> str:
+    """Select Responses for OpenAI-compatible Responses endpoints and Chat Completions for the major providers."""
+    if LLM_API_MODE in {"responses", "chat"}:
+        return LLM_API_MODE
+    return "chat" if LLM_PROVIDER in {"deepseek", "glm"} else "responses"
+
+
 def model_client() -> OpenAI:
     if not API_KEY:
         raise HTTPException(
             status_code=503,
-            detail="尚未配置 OpenAI API 密钥。请按使用说明创建本地 .env 文件并填写 OPENAI_API_KEY。",
+            detail="尚未配置模型 API 密钥。请复制 .env.example 为 .env，选择 LLM_PROVIDER 并填写 LLM_API_KEY。",
         )
     client_options = {"api_key": API_KEY}
     if BASE_URL:
         client_options["base_url"] = BASE_URL
     return OpenAI(**client_options)
+
+
+def _chat_messages(input_items: list[dict], instructions: str) -> list[dict]:
+    """Convert Responses-style input blocks to OpenAI-compatible chat messages."""
+    messages: list[dict] = [{"role": "system", "content": instructions}]
+    for item in input_items:
+        if not isinstance(item, dict):
+            continue
+        role = item.get("role", "user")
+        content = item.get("content", "")
+        if isinstance(content, str):
+            messages.append({"role": role, "content": content})
+            continue
+        converted = []
+        for block in content if isinstance(content, list) else []:
+            if not isinstance(block, dict):
+                continue
+            block_type = block.get("type")
+            if block_type in {"input_text", "text"}:
+                converted.append({"type": "text", "text": str(block.get("text", ""))})
+            elif block_type in {"input_image", "image_url"}:
+                image_url = block.get("image_url")
+                if isinstance(image_url, dict):
+                    image_url = image_url.get("url")
+                converted.append({"type": "image_url", "image_url": {"url": image_url}})
+        messages.append({"role": role, "content": converted or ""})
+    return messages
+
+
+def _chat_response_text(response: object) -> str:
+    choices = getattr(response, "choices", None) or []
+    if not choices:
+        return ""
+    message = getattr(choices[0], "message", None)
+    content = getattr(message, "content", "") if message else ""
+    if isinstance(content, list):
+        return "".join(str(part.get("text", "")) if isinstance(part, dict) else str(part) for part in content)
+    return str(content or "")
 
 
 def push_guidelines() -> str:
@@ -339,13 +373,21 @@ def call_model(
         for index, model_name in enumerate(models):
             try:
                 model_effort = effort if index == 0 else (fallback_reasoning_effort or effort)
-                response = client.responses.create(
-                    model=model_name,
-                    reasoning={"effort": model_effort},
-                    instructions=instructions,
-                    input=input_items,
-                    max_output_tokens=max_output_tokens,
-                )
+                if effective_api_mode() == "chat":
+                    raw_response = client.chat.completions.create(
+                        model=model_name,
+                        messages=_chat_messages(input_items, instructions),
+                        max_tokens=max_output_tokens,
+                    )
+                    response = SimpleNamespace(output_text=_chat_response_text(raw_response), raw=raw_response)
+                else:
+                    response = client.responses.create(
+                        model=model_name,
+                        reasoning={"effort": model_effort},
+                        instructions=instructions,
+                        input=input_items,
+                        max_output_tokens=max_output_tokens,
+                    )
                 return response, model_name
             except Exception as exc:
                 last_error = exc
@@ -393,7 +435,7 @@ def model_error_message(prefix: str, exc: Exception) -> str:
     status_code = getattr(exc, "status_code", None)
     error_text = str(exc)
     if status_code == 409 or "operation_in_progress" in error_text:
-        return f"{prefix}：Aizex 账号当前还有上一条请求处理中，请等待几秒后再试。"
+        return f"{prefix}：{LLM_PROVIDER} 服务当前还有上一条请求处理中，请等待几秒后再试。"
     if status_code in {401, 403}:
         return f"{prefix}：API 密钥或模型权限不可用，请检查根目录 .env 文件。"
     return f"{prefix}：{type(exc).__name__}: {exc}"
@@ -788,30 +830,13 @@ def home() -> FileResponse:
 
 @app.post("/api/login")
 def login(payload: AccessRequest):
-    if not APP_ACCESS_CODE:
-        return {"authenticated": True, "auth_enabled": False}
-    if not secrets.compare_digest(payload.access_code.strip(), APP_ACCESS_CODE):
-        raise HTTPException(status_code=401, detail="访问码不正确，请向网站提供者索取访问码。")
-    session = secrets.token_urlsafe(32)
-    _ACCESS_SESSIONS.add(session)
-    response = JSONResponse({"authenticated": True, "auth_enabled": True})
-    response.set_cookie(
-        ACCESS_COOKIE,
-        session,
-        httponly=True,
-        samesite="lax",
-        max_age=86400,
-    )
-    return response
+    """Backward-compatible no-op for old browser bundles."""
+    return {"authenticated": True, "auth_enabled": False}
 
 
 @app.post("/api/logout")
 def logout(request: Request):
-    session = request.cookies.get(ACCESS_COOKIE, "")
-    _ACCESS_SESSIONS.discard(session)
-    response = JSONResponse({"authenticated": False})
-    response.delete_cookie(ACCESS_COOKIE)
-    return response
+    return {"authenticated": False, "auth_enabled": False}
 
 
 @app.get("/api/status")
@@ -830,9 +855,11 @@ def status() -> dict:
         "model_sol": MODEL_SOL,
         "reasoning_luna": REASONING_LUNA,
         "reasoning_sol": REASONING_SOL,
-        "api_provider": urlsplit(BASE_URL).hostname if BASE_URL else "api.openai.com",
+        "api_provider": LLM_PROVIDER,
+        "api_base_url": BASE_URL,
+        "api_mode": effective_api_mode(),
         "article_count": count,
-        "auth_enabled": bool(APP_ACCESS_CODE),
+        "auth_enabled": False,
     }
 
 

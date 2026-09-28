@@ -12,7 +12,7 @@
 ## 本地运行
 
 1. 安装 Python 3.11 或更新版本。
-2. 复制 `.env.example` 为 `.env`，填写 `OPENAI_API_KEY`。
+2. 复制 `.env.example` 为 `.env`，选择模型厂商并填写你自己的 `LLM_API_KEY`。
 3. 双击 `启动推送助手.bat`，或运行：
 
    ```powershell
@@ -24,15 +24,14 @@
 
 ## 分享给同一局域网的人
 
-网页必须由你的电脑运行后端，不能只把 HTML 文件发给别人。复制下面三行到本地 `.env` 并修改访问码：
+网页必须由你的电脑运行后端，不能只把 HTML 文件发给别人。当前仓库已取消访问码，局域网模式只适合可信网络；复制下面两行到本地 `.env`：
 
 ```text
 APP_HOST=0.0.0.0
 APP_PORT=8000
-APP_ACCESS_CODE=请设置一个共享访问码
 ```
 
-重启 `启动推送助手.bat` 后，启动窗口会显示一个局域网地址，例如 `http://192.168.1.23:8000`。把这个地址和访问码发给同一局域网的人即可。访问码通过后端 Cookie 保存，AI API Key 只在你的电脑后端使用，不会发给浏览器。
+重启 `启动推送助手.bat` 后，启动窗口会显示一个局域网地址，例如 `http://192.168.1.23:8000`。把地址发给同一局域网的人即可。每个合作者应在自己 clone 的项目中配置自己的模型 API Key；API Key 只在该电脑后端使用，不会发给浏览器。
 
 如果别人无法打开，确认两台电脑在同一个 Wi-Fi 或局域网，并在 Windows 防火墙提示时允许 Python 在“专用网络”通信。不要把 `APP_HOST=0.0.0.0` 的服务直接暴露到公网；需要公网访问时，应放到有 HTTPS、登录和反向代理的服务器上。
 
@@ -61,7 +60,27 @@ Agent 会从本地历史文章中选择相似排版风格，生成带行内样�
 - `gpt-6-luna`：消息整合、历史检索、海报字段、问卷等高频结构化任务；
 - `gpt-6-sol`：策划案、推送 HTML、PPT 叙事、活动总结对照和发布前复核。
 
-当前 Luna 暂时不可用，原本分配给 Luna 的角色已临时映射到 `gpt-6-sol` + `low`。复杂 Agent 继续使用 `gpt-6-sol` + `high`。可以在 `.env` 中分别设置 `OPENAI_MODEL_LUNA`、`OPENAI_MODEL_SOL`、`OPENAI_REASONING_LUNA` 和 `OPENAI_REASONING_SOL`。`OPENAI_BASE_URL` 可以配置为 OpenAI 兼容服务地址，例如 Aizex Codex API。真实密钥只放在本地 `.env`，不要提交到仓库。
+当前 Luna 暂时不可用，原本分配给 Luna 的角色已临时映射到 `gpt-6-sol` + `low`。复杂 Agent 继续使用 `gpt-6-sol` + `high`。每个 clone 都可以独立配置以下模型厂商：
+
+| `LLM_PROVIDER` | `LLM_BASE_URL` 示例 | `LLM_API_MODE` | 模型示例 |
+|---|---|---|---|
+| `openai` | `https://api.openai.com/v1` | `responses` | 账号可用的 GPT 模型 |
+| `aizex` | `https://codex-api.aizex.net/v1` | `responses` 或 `auto` | 中转站提供的模型名 |
+| `deepseek` | `https://api.deepseek.com/v1` | `chat` 或 `auto` | `deepseek-chat` |
+| `glm` | `https://open.bigmodel.cn/api/paas/v4` | `chat` 或 `auto` | 账号可用的 GLM 模型 |
+
+配置示例：
+
+```text
+LLM_PROVIDER=deepseek
+LLM_API_KEY=你的 DeepSeek Key
+LLM_BASE_URL=https://api.deepseek.com/v1
+LLM_API_MODE=auto
+LLM_MODEL=deepseek-chat
+```
+
+OpenAI 官方 SDK 使用服务端 API Key；OpenAI 官方文档也要求 API Key 保存在环境变量或密钥管理服务中，不要放入浏览器代码。[官方 OpenAI API 快速开始](https://platform.openai.com/docs/quickstart/make-your-first-api-request)
+程序会根据厂商自动选择 Responses API 或 Chat Completions；也可以用 `LLM_API_MODE=responses` 或 `chat` 强制指定。旧的 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和 `OPENAI_MODEL` 变量仍兼容。真实密钥只放在本地 `.env`，不要提交到仓库。
 
 完整的阶段、输入输出合同和人工卡点见 [工作流Agent分工方案.md](工作流Agent分工方案.md)。管理页面可通过 `GET /api/workflow/manifest` 读取流程定义。
 

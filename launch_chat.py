@@ -41,8 +41,8 @@ def open_existing_server() -> bool:
 
 
 if __name__ == "__main__":
-    if HOST not in {"127.0.0.1", "localhost"} and not os.getenv("APP_ACCESS_CODE", "").strip():
-        print("提示：当前绑定了局域网地址，但没有设置 APP_ACCESS_CODE。建议在 .env 中设置共享访问码。")
+    if HOST not in {"127.0.0.1", "localhost"}:
+        print("提示：当前绑定了局域网地址，仓库已取消访问码，请只在可信网络使用。")
     if open_existing_server():
         raise SystemExit(0)
     Thread(target=open_browser_when_ready, daemon=True).start()
@@ -56,5 +56,5 @@ if __name__ == "__main__":
             print(f"局域网访问：http://{lan_ip}:{PORT}")
         except OSError:
             print(f"局域网访问：http://你的电脑IP:{PORT}")
-        print("访问码已启用" if os.getenv("APP_ACCESS_CODE", "").strip() else "访问码未启用")
+        print("访问码已取消；模型 API Key 仅从本机 .env 读取")
     uvicorn.run("app:app", host=HOST, port=PORT, log_level="info", ws="none")
