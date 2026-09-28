@@ -19,7 +19,26 @@
     .new-chat:hover,.send:hover { background:#3158c7; }
     .new-push { border:1px solid #cbd6f5; background:#fff; color:#3d5fc9; border-radius:10px; padding:10px 14px; text-align:left; }
     .new-push:hover { background:#f1f4ff; }
+    .side-brainstorm { border:1px solid #dbe3f0; border-radius:12px; background:#fff; padding:11px; }
+    .side-brainstorm h3 { margin:0 0 4px; font-size:13px; }
+    .side-brainstorm p { margin:0 0 8px; color:var(--muted); font-size:11px; line-height:1.45; }
+    .side-brainstorm-log { max-height:180px; overflow:auto; display:grid; gap:6px; margin:8px 0; }
+    .side-brainstorm-msg { padding:7px 8px; border-radius:8px; background:#f4f6f9; white-space:pre-wrap; font-size:11px; line-height:1.45; }
+    .side-brainstorm-msg.user { background:#edf2ff; }
+    .side-brainstorm-form { display:flex; gap:5px; }
+    .side-brainstorm-form textarea { min-height:34px; max-height:70px; padding:6px; border:1px solid #dce2eb; border-radius:7px; font-size:12px; }
+    .side-brainstorm-form button { flex:none; width:30px; border:0; border-radius:7px; background:var(--blue); color:#fff; }
     .side-label { color:#98a2b1; font-size:11px; letter-spacing:.08em; font-weight:700; margin:0 4px -10px; }
+    .project-list { display:grid; gap:5px; max-height:260px; overflow:auto; }
+    .project-link { width:100%; border:1px solid transparent; background:transparent; border-radius:9px; padding:8px 9px; text-align:left; color:#52627b; }
+    .project-link:hover { background:#fff; border-color:var(--line); }
+    .project-link.active { background:#edf2ff; border-color:#cbd6f5; color:#314c9a; }
+    .project-link strong { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:12px; }
+    .project-link small { display:block; color:#8a95a6; font-size:10px; margin-top:2px; }
+    .save-status { color:#8994a5; font-size:11px; margin:4px 2px 0; min-height:17px; }
+    .document-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:10px 0 0; }
+    .document-actions a { border:1px solid #bdcafa; border-radius:8px; padding:7px 11px; color:#334b91; text-decoration:none; font-size:12px; background:#fff; }
+    .document-actions button { margin:0; }
     .suggestions { display:grid; gap:7px; }
     .suggestion { border:1px solid transparent; background:transparent; color:#536176; text-align:left; border-radius:9px; padding:9px 10px; font-size:13px; }
     .suggestion:hover { background:white; border-color:var(--line); color:var(--ink); }
@@ -103,7 +122,69 @@
     .visual-card { border:1px solid var(--line); border-radius:8px; padding:9px 10px; background:#fff; font-size:12px; color:#52627b; }
     .visual-card strong { color:#30415c; }
     .generated-image { width:100%; max-width:420px; border-radius:8px; display:block; margin-top:8px; }
-    @media(max-width:740px) { .shell{grid-template-columns:1fr} aside{display:none} header{padding:0 18px} .scroll{padding:16px 15px}.welcome{padding-top:7vh}.composer-wrap{padding:13px 12px 16px}.push-grid{grid-template-columns:1fr}.mode-tabs{display:none} }
+    .activity-stepper { display:flex; gap:8px; margin:18px 0 14px; }
+    .activity-step { flex:1; border:1px solid var(--line); background:#fff; color:#6b778a; border-radius:10px; padding:9px 10px; font-size:12px; }
+    .activity-step span { display:inline-grid; place-items:center; width:21px; height:21px; border-radius:50%; margin-right:5px; background:#edf1f7; }
+    .activity-step.active { color:#334b91; border-color:#bdcafa; background:#f7f9ff; }
+    .activity-step.active span { background:var(--blue); color:#fff; }
+    .stage-help { color:var(--muted); font-size:13px; margin:0 0 13px; }
+    .stage-error { margin-top:9px; border:1px solid #f0c9c5; border-radius:8px; background:#fff7f5; color:#a53d33; padding:8px 10px; font-size:12px; }
+    .stage-result { margin-top:18px; border-top:1px solid var(--line); padding-top:15px; }
+    .result-heading { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; font-size:14px; }
+    .result-heading span { color:var(--muted); font-size:11px; font-weight:400; }
+    .editable-output { width:100%; min-height:230px; border:1px solid #cfd8e8; border-radius:9px; padding:11px; font:13px/1.7 "Segoe UI","Microsoft YaHei",sans-serif; resize:vertical; color:var(--ink); background:#fbfcff; }
+    .structured-editor { display:grid; gap:10px; }
+    .editor-card { border:1px solid #dfe5ef; border-radius:11px; background:#fff; padding:12px; box-shadow:0 2px 8px #25314208; }
+    .editor-card h4 { margin:0 0 8px; font-size:13px; color:#334b91; }
+    .editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+    .editor-field { display:grid; gap:4px; }
+    .editor-field.wide { grid-column:1/-1; }
+    .editor-field label { font-size:11px; color:#778397; }
+    .editor-field input,.editor-field textarea,.editor-field select { width:100%; border:1px solid #dce2eb; border-radius:7px; padding:7px 8px; font-family:inherit; font-size:12px; line-height:1.55; color:var(--ink); background:#fbfcff; }
+    .editor-field textarea { min-height:54px; resize:vertical; }
+    .fact-card { border:1px solid #e5eaf0; border-radius:8px; padding:9px; margin-top:8px; background:#fbfcfe; }
+    .fact-card:first-child { margin-top:0; }
+    .fact-card .editor-grid { grid-template-columns:1fr 1fr 120px; }
+    .editor-hint { margin:0 0 8px; color:var(--muted); font-size:11px; }
+    .raw-toggle { border:0; background:transparent; color:#64749a; padding:0; font-size:11px; cursor:pointer; }
+    .raw-json { display:none; margin-top:8px; }
+    .raw-json.open { display:block; }
+    .large-output { min-height:180px !important; }
+    .tall-output { min-height:360px; }
+    .secondary-button { margin-top:10px; border:1px solid #bdcafa; border-radius:9px; background:#f7f9ff; color:#334b91; padding:8px 13px; }
+    .content-options { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin:12px 0 15px; }
+    .content-option { display:grid; gap:3px; border:1px solid var(--line); border-radius:9px; padding:10px; cursor:pointer; background:#fff; }
+    .content-option:has(input:checked) { border-color:#a9b9f2; background:#f7f9ff; }
+    .content-option input { accent-color:var(--blue); }
+    .content-option strong { font-size:13px; }
+    .content-option small { color:var(--muted); font-size:11px; line-height:1.45; }
+    .content-result { display:grid; gap:9px; }
+    .content-result-card { border:1px solid var(--line); border-radius:9px; padding:11px; background:#fff; }
+    .content-result-card strong { display:block; margin-bottom:4px; }
+    .content-result-card p { margin:0; color:var(--muted); font-size:12px; }
+    .content-result-card a { display:inline-block; margin-top:8px; color:#3d5fc9; font-size:12px; }
+    .dropzone { border:1px dashed #b9c7e8; border-radius:10px; padding:14px; text-align:center; color:#657492; background:#fafbff; cursor:pointer; font-size:12px; }
+    .dropzone.dragover { border-color:var(--blue); background:#edf2ff; color:#334b91; }
+    .dropzone input { display:none; }
+    .attachment-list { display:flex; flex-wrap:wrap; gap:6px; margin-top:7px; }
+    .attachment-chip { display:inline-flex; align-items:center; gap:5px; border:1px solid #dbe3f0; border-radius:15px; background:#fff; padding:4px 8px; font-size:11px; color:#52627b; }
+    .attachment-chip button { border:0; background:transparent; color:#9aa4b2; padding:0; cursor:pointer; }
+    .library-panel { border:1px solid #dbe3f0; border-radius:11px; padding:12px; background:#fbfcff; }
+    .library-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .library-head strong { font-size:13px; }
+    .library-head button { border:1px solid #bdcafa; border-radius:7px; background:#fff; color:#334b91; padding:5px 9px; font-size:11px; }
+    .library-note { margin:5px 0 9px; color:var(--muted); font-size:11px; }
+    .library-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .library-card { border:1px solid #dfe5ef; border-radius:8px; background:#fff; padding:6px; min-width:0; }
+    .library-card:has(input:checked) { border-color:#8ca5ee; background:#f4f7ff; }
+    .library-card img { width:100%; height:105px; object-fit:contain; background:#f2f4f8; border-radius:5px; display:block; }
+    .library-card label { display:flex; align-items:flex-start; gap:5px; margin-top:5px; cursor:pointer; }
+    .library-card label span { font-size:11px; overflow-wrap:anywhere; line-height:1.4; max-height:47px; overflow:hidden; }
+    .library-card small,.library-card a { display:block; color:#728096; font-size:10px; text-decoration:none; }
+    .library-status { color:#6b778a; font-size:11px; margin-top:7px; }
+    .attachment-usage { flex:1; min-width:130px; border:1px solid #dbe2ee; border-radius:5px; padding:3px 5px; font-size:11px; }
+    .attachment-placement { border:1px solid #dbe2ee; border-radius:5px; padding:3px 4px; font-size:11px; background:#fff; }
+    @media(max-width:740px) { .shell{grid-template-columns:1fr} aside{display:none} header{padding:0 18px} .scroll{padding:16px 15px}.welcome{padding-top:7vh}.composer-wrap{padding:13px 12px 16px}.push-grid,.editor-grid,.fact-card .editor-grid{grid-template-columns:1fr}.mode-tabs{display:none}.content-options,.library-grid{grid-template-columns:1fr 1fr}.activity-step{font-size:11px;padding:8px 4px} }
   </style>
 </head>
 <body>
@@ -122,7 +203,21 @@
     <aside>
       <div class="brand"><div class="logo">档</div><div><strong>推送档案助手</strong><span>从过往文章中找经验</span></div></div>
       <button class="new-chat" id="newChat">＋　新对话</button>
-      <button class="new-push" id="newPush">✦　写一篇推送</button>
+      <button class="new-push" id="newPush">＋　新建活动</button>
+      <div>
+        <p class="side-label">活动历史</p>
+        <div class="project-list" id="activityHistory"></div>
+        <p class="save-status" id="projectSaveStatus"></p>
+      </div>
+      <section class="side-brainstorm">
+        <h3>Brainstorm 建议 Agent</h3>
+        <p>它可以读取当前活动工作台中的资料，帮你想主题、流程、风险和下一步。</p>
+        <div class="side-brainstorm-log" id="brainstormAdvisorLog"></div>
+        <form class="side-brainstorm-form" id="brainstormAdvisorForm">
+          <textarea id="brainstormAdvisorInput" rows="1" placeholder="例如：这个活动还缺什么？"></textarea>
+          <button type="submit" aria-label="发送建议问题">↑</button>
+        </form>
+      </section>
       <p class="side-label">可以这样问</p>
       <div class="suggestions">
         <button class="suggestion">之前办过哪些新生类活动？</button>
@@ -139,7 +234,7 @@
         <h1>历史推送问答</h1>
         <div class="mode-tabs">
           <button class="mode-tab active" id="chatMode">查历史</button>
-          <button class="mode-tab" id="pushMode">写推送</button>
+          <button class="mode-tab" id="pushMode">办活动</button>
         </div>
         <div class="connection" id="connection"><span class="dot"></span><span id="connectionText">正在连接</span></div>
       </header>
@@ -159,42 +254,83 @@
         </div>
         <section class="generator" id="generatorView" hidden>
           <div class="generator-intro">
-            <h2>生成秀米推送预览</h2>
-            <p>按向导填写活动资料，生成可导入秀米、再继续人工修改的 HTML 草稿。</p>
+            <h2>办一场活动</h2>
+            <p>从讨论资料开始，先整理事实，再生成策划案，最后按需制作推送、海报、问卷或 PPT。</p>
           </div>
-          <div class="guideline-note">图片由你提供，Agent 不自行生成图片。当前支持本次上传的图片；以后可以把这里接成学院素材库。没有确认的信息会标为「[待确认]」。</div>
-          <form class="push-form" id="pushForm">
-            <div class="step-label">第一步　活动信息</div>
-            <div class="push-grid">
-              <div class="field"><label for="eventTime">活动时间</label><input id="eventTime" placeholder="例如：2026年10月10日 14:00"></div>
-              <div class="field"><label for="location">活动地点</label><input id="location" placeholder="例如：校本部东操场"></div>
-            </div>
-            <div class="push-grid">
-              <div class="field"><label for="theme">活动主题（必填）</label><input id="theme" required placeholder="例如：新生校园定向越野"></div>
-              <div class="field"><label for="pushType">文章类型</label><select id="pushType"><option>预热</option><option>总结</option></select></div>
-            </div>
-            <div class="field"><label for="audience">面向对象</label><input id="audience" placeholder="例如：工学院2026级新生"></div>
-            <div class="field"><label for="activityIntro">活动介绍（必填）</label><textarea id="activityIntro" required placeholder="用自己的话介绍活动要做什么、为什么举办、希望读者了解什么"></textarea></div>
-            <div class="step-label">第二步　已有文字资料</div>
-            <div class="field"><label for="copyBackground">预使用文案：背景</label><textarea id="copyBackground" placeholder="已经写好的背景材料，没有可以留空"></textarea></div>
-            <div class="field"><label for="copyProcess">预使用文案：流程</label><textarea id="copyProcess" placeholder="已经写好的活动流程、环节、时间安排，没有可以留空"></textarea></div>
-            <div class="field"><label for="copySummary">预使用文案：总结</label><textarea id="copySummary" placeholder="总结稿可填写现场情况、成果、感受；预热稿可以留空"></textarea></div>
-            <div class="field"><label for="plan">策划案</label><textarea id="plan" placeholder="可以粘贴策划案中的目标、对象、流程、注意事项等，Agent 会把它当作资料整理"></textarea></div>
-            <div class="step-label">第三步　素材与审核</div>
-            <div class="push-grid">
-              <div class="field"><label for="reviewer">审核人</label><input id="reviewer" placeholder="例如：尹老师"></div>
-              <div class="field"><label for="imagePool">预使用图片 / 图片池</label><input id="imagePool" type="file" accept="image/*" multiple><small id="imageNames" class="source-meta">可选择首图、正文图、尾图；图片会嵌入导出的 HTML。</small></div>
-            </div>
-            <button class="generate-button" id="generateButton">生成秀米预览</button>
-          </form>
-          <div class="draft-panel" id="draftPanel" hidden>
-            <h3>秀米推送预览</h3>
-            <div class="draft" id="draftText"></div>
-            <div class="source-meta" id="draftMeta"></div>
-            <div class="visual-plan" id="visualPlan"></div>
-            <div class="check-row" id="xiumiActions"></div>
-            <div class="draft-sources" id="draftSources"></div>
+          <div class="guideline-note">每一步都可以人工补充和修改。历史文章只用于参考表达与结构，不会自动补全本次活动事实。</div>
+          <div class="activity-stepper" id="activityStepper">
+            <button type="button" class="activity-step active" data-stage="brainstorm"><span>1</span> Brainstorm</button>
+            <button type="button" class="activity-step" data-stage="planning"><span>2</span> 策划</button>
+            <button type="button" class="activity-step" data-stage="content"><span>3</span> 内容制作</button>
           </div>
+
+          <section class="activity-stage" id="brainstormStage">
+            <div class="step-label">第一步　消息整合</div>
+            <p class="stage-help">粘贴长篇对话总结、群聊消息、会议记录或你自己的活动想法。Agent 先提取关键信息，具体字段和提取风格后续可继续调整。</p>
+            <div class="field"><label for="brainstormInput">对话总结 / 群聊消息（也可只上传文件）</label><textarea id="brainstormInput" placeholder="例如：大家讨论了要在下个月为新生办一次交流活动……"></textarea></div>
+            <div class="field"><label for="brainstormExtra">补充背景（可选）</label><textarea id="brainstormExtra" placeholder="学院要求、已有资源、时间限制、希望解决的问题等"></textarea></div>
+            <div class="field"><label>资料和图片（可拖入）</label><div class="dropzone" data-dropzone="brainstorm">拖入文件或图片，或点击选择<input id="brainstormFiles" type="file" multiple></div><div class="attachment-list" id="brainstormAttachments"></div></div>
+            <button class="generate-button" id="brainstormButton" type="button">整理关键信息</button>
+            <div class="stage-error" id="brainstormError" hidden></div>
+            <div class="stage-result" id="brainstormResult" hidden>
+              <div class="result-heading"><strong>关键信息底稿</strong><span id="brainstormMeta"></span></div>
+              <div id="brainstormEditor" class="structured-editor"></div>
+              <button type="button" class="raw-toggle" data-target="brainstormOutput">显示原始 JSON（高级编辑）</button>
+              <textarea id="brainstormOutput" class="editable-output raw-json" placeholder="这里可以直接修改，确认后进入策划阶段"></textarea>
+              <button class="secondary-button" id="toPlanningButton" type="button">确认底稿，进入策划</button>
+            </div>
+          </section>
+
+          <section class="activity-stage" id="planningStage" hidden>
+            <div class="step-label">第二步　策划案</div>
+            <p class="stage-help">检查并修改第一步的事实底稿，再补充你的策划要求。策划案 Agent 会结合本地历史文章生成初稿。</p>
+            <div class="field"><label for="planningBrainstorm">已确认的关键信息</label><textarea id="planningBrainstorm" class="large-output" placeholder="完成第一步后会自动带入，也可以直接修改"></textarea></div>
+            <div class="field"><label for="planningAdditions">你要补充的信息 / 策划要求</label><textarea id="planningAdditions" placeholder="例如：希望活动轻松一些，控制在两小时内，需要安排分组交流"></textarea></div>
+            <div class="field"><label for="planningStyle">风格要求（可选）</label><input id="planningStyle" value="清晰、稳妥、可执行" placeholder="例如：正式、简洁，适合提交学院审核"></div>
+            <div class="field"><label for="planningTemplate">策划案类型</label><select id="planningTemplate"><option value="auto">自动匹配</option><option value="detailed">详细版 · 新生手册类项目</option><option value="medium">中等版 · 大一交流会类活动</option><option value="concise">简洁版 · 图书漂流类活动</option></select></div>
+            <div class="field"><label>策划参考文件和图片（可拖入）</label><div class="dropzone" data-dropzone="planning">拖入策划案、表格、图片或 PDF，或点击选择<input id="planningFiles" type="file" multiple></div><div class="attachment-list" id="planningAttachments"></div></div>
+            <button class="generate-button" id="planningButton" type="button">生成策划案</button>
+            <div class="stage-error" id="planningError" hidden></div>
+            <div class="stage-result" id="planningResult" hidden>
+              <div class="result-heading"><strong>策划案初稿</strong><span id="planningMeta"></span></div>
+              <div id="planningEditor" class="structured-editor"></div>
+              <button type="button" class="raw-toggle" data-target="planningOutput">显示原始 JSON（高级编辑）</button>
+              <textarea id="planningOutput" class="editable-output tall-output raw-json" placeholder="这里可以直接修改策划案，确认后选择内容制作"></textarea>
+              <div class="document-actions"><a id="planningDocxLink" hidden>下载 Word 策划案</a><a id="planningPdfLink" hidden>下载 PDF 策划案</a><button type="button" class="secondary-button" id="refreshPlanDocuments">按当前修改重新导出</button></div>
+              <button class="secondary-button" id="toContentButton" type="button">确认策划案，进入内容制作</button>
+            </div>
+          </section>
+
+          <section class="activity-stage" id="contentStage" hidden>
+            <div class="step-label">第三步　可选内容制作</div>
+            <p class="stage-help">没有强制项。选择需要的内容，继续补充用途、风格和素材要求，Agent 会参考历史数据库与策划案生成结果。</p>
+            <div class="content-options" id="contentOptions">
+              <label class="content-option"><input type="checkbox" value="push" checked><strong>图文推送</strong><small>生成公众号文案、秀米 HTML 和浏览器预览</small></label>
+              <label class="content-option"><input type="checkbox" value="poster"><strong>海报</strong><small>先生成模板字段和视觉方案</small></label>
+              <label class="content-option"><input type="checkbox" value="survey"><strong>问卷</strong><small>生成报名或调研字段</small></label>
+              <label class="content-option"><input type="checkbox" value="ppt"><strong>PPT</strong><small>生成汇报结构和页级内容</small></label>
+            </div>
+            <div class="push-grid">
+              <div class="field"><label for="contentTheme">活动名称 / 推送主题</label><input id="contentTheme" placeholder="例如：新生交流活动"></div>
+              <div class="field"><label for="contentAudience">面向对象（可选）</label><input id="contentAudience" placeholder="例如：2026级新生"></div>
+            </div>
+            <div class="field"><label for="contentRequirements">内容补充与风格要求（可选）</label><textarea id="contentRequirements" placeholder="例如：推送语气亲切，海报突出报名截止时间，PPT 控制在 8 页以内"></textarea></div>
+            <div class="field"><label for="contentReviewer">审核人（可选）</label><input id="contentReviewer" placeholder="例如：尹老师"></div>
+            <div class="library-panel">
+              <div class="library-head"><strong>本地图片素材库</strong><button type="button" id="refreshLibrary">按当前主题重新推荐</button></div>
+              <p class="library-note">自动查找 data/ 中的学院素材。学校学院文件夹的首图和尾图会固定放在推送开头和结尾；过渡图标可放在正文。往期推送图片暂不作为本次配图。</p>
+              <div class="library-grid" id="libraryGrid"></div>
+              <div class="library-status" id="libraryStatus">进入本步骤后自动推荐。</div>
+            </div>
+            <div class="field"><label for="contentTemplate">历史推送排版模板（可选）</label><select id="contentTemplate"><option value="">由 Agent 按主题选择</option></select><small class="field-help">模板只提取颜色、间距和图片/章节结构，不带入往期活动事实。</small></div>
+            <div class="field"><label>内容素材和参考文件（可拖入）</label><div class="dropzone" data-dropzone="content">拖入图片、文档、表格或其他素材，或点击选择<input id="contentFiles" type="file" multiple></div><div class="attachment-list" id="contentAttachments"></div></div>
+            <button class="generate-button" id="contentButton" type="button">生成所选内容</button>
+            <div class="stage-error" id="contentError" hidden></div>
+            <div class="stage-result" id="contentResult" hidden>
+              <div class="result-heading"><strong>内容制作结果</strong><span id="contentMeta"></span></div>
+              <div id="contentOutput" class="content-result"></div>
+            </div>
+          </section>
         </section>
       </div>
       <div class="composer-wrap">
@@ -256,6 +392,22 @@
       return row;
     }
 
+    async function apiFetch(url, options = {}) {
+      const response = await fetch(url, options);
+      if (response.status === 401) {
+        let detail = '登录已过期，请重新输入访问码。';
+        try {
+          const data = await response.clone().json();
+          if (data.detail) detail = data.detail;
+        } catch (_) {}
+        document.getElementById('accessGate').classList.add('visible');
+        document.getElementById('accessCode').value = '';
+        document.getElementById('accessCode').focus();
+        throw new Error(detail);
+      }
+      return response;
+    }
+
     async function sendMessage(value) {
       const message = (value ?? input.value).trim();
       if (!message || sendButton.disabled) return;
@@ -265,7 +417,7 @@
       sendButton.disabled = true;
       const waiting = addMessage('assistant', '正在查找本地文章并整理回答…');
       try {
-        const response = await fetch('/api/chat', {
+        const response = await apiFetch('/api/chat', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({message, history: history.slice(-8)})
         });
@@ -290,11 +442,473 @@
       document.getElementById('conversation').hidden = writing;
       generatorView.hidden = !writing;
       composerWrap.hidden = writing;
-      headerTitle.textContent = writing ? '推送 Agent' : '历史推送问答';
-      if (writing) document.getElementById('theme').focus();
+      headerTitle.textContent = writing ? '办一场活动' : '历史推送问答';
+      if (writing) {
+        if (!activeProjectId) ensureProject().catch(error => { document.getElementById('projectSaveStatus').textContent = error.message; });
+        document.getElementById('brainstormInput').focus();
+      }
     }
 
     let lastXiumiHtml = '';
+    let brainstormDraft = '';
+    let planningDraft = '';
+    const activityAttachments = { brainstorm: [], planning: [], content: [] };
+    let activeProjectId = null;
+    let activeStage = 'brainstorm';
+    let contentDraft = null;
+    let planningDocuments = {};
+    let saveTimer = null;
+    let saveChain = Promise.resolve();
+    let createProjectPromise = null;
+    let restoringProject = false;
+    let libraryCandidates = [];
+    let librarySelectedIds = [];
+    let libraryTemplates = [];
+    let libraryInitialized = false;
+    let libraryQuery = '';
+    const workspaceFields = ['brainstormInput','brainstormExtra','brainstormOutput','planningBrainstorm','planningAdditions','planningStyle','planningTemplate','planningOutput','contentTheme','contentAudience','contentRequirements','contentReviewer','contentTemplate'];
+
+    function projectTitle() {
+      const direct = document.getElementById('contentTheme').value.trim();
+      if (direct) return direct.slice(0, 80);
+      for (const [id, key] of [['planningOutput','title'],['brainstormOutput','suggested_activity_name']]) {
+        try { const title = JSON.parse(document.getElementById(id).value)[key]; if (title) return String(title).slice(0, 80); } catch (_) {}
+      }
+      return document.getElementById('brainstormInput').value.trim().split('\n')[0].slice(0, 36) || '未命名活动';
+    }
+
+    function projectSnapshot() {
+      const fields = Object.fromEntries(workspaceFields.map(id => [id, document.getElementById(id).value]));
+      const meta = Object.fromEntries(['brainstormMeta','planningMeta','contentMeta'].map(id => [id, document.getElementById(id).textContent]));
+      const attachments = Object.fromEntries(Object.entries(activityAttachments).map(([stage, files]) => [stage, files.map(file => {
+        const item = {name:file.name,mime_type:file.mime_type,size:file.size,text:file.text || '',storage_id:file.storage_id || ''};
+        if (!item.storage_id && file.data_url) item.data_url = file.data_url;
+        return item;
+      })]));
+      return {title:projectTitle(),stage:activeStage,fields,meta,attachments,content_types:[...document.querySelectorAll('#contentOptions input:checked')].map(x => x.value),content_result:contentDraft,planning_documents:planningDocuments,advisor_history:advisorHistory.slice(-20),library_candidates:libraryCandidates,library_selected_ids:librarySelectedIds,library_initialized:libraryInitialized,library_query:libraryQuery};
+    }
+
+    async function ensureProject() {
+      if (activeProjectId) return activeProjectId;
+      if (!createProjectPromise) createProjectPromise = (async () => {
+        const response = await apiFetch('/api/activity/projects', {method:'POST'});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '新建活动失败');
+        activeProjectId = data.id; localStorage.setItem('coe_active_project', data.id);
+        await loadProjectList(); return data.id;
+      })().finally(() => { createProjectPromise = null; });
+      return createProjectPromise;
+    }
+
+    function scheduleProjectSave() {
+      if (restoringProject) return;
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveProjectNow().catch(error => { document.getElementById('projectSaveStatus').textContent = `保存失败：${error.message}`; }), 700);
+    }
+
+    function saveProjectNow() {
+      clearTimeout(saveTimer);
+      saveChain = saveChain.catch(() => {}).then(async () => {
+        if (restoringProject) return;
+        const id = await ensureProject();
+        const state = projectSnapshot();
+        document.getElementById('projectSaveStatus').textContent = '正在保存…';
+        const response = await apiFetch(`/api/activity/projects/${id}`, {method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({state})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '活动保存失败');
+        for (const [stage, refs] of Object.entries(data.attachment_refs || {})) refs.forEach((ref, index) => { if (activityAttachments[stage]?.[index]) activityAttachments[stage][index].storage_id = ref; });
+        document.getElementById('projectSaveStatus').textContent = '已保存';
+        await loadProjectList();
+      });
+      return saveChain;
+    }
+
+    async function loadProjectList() {
+      const response = await apiFetch('/api/activity/projects');
+      const data = await response.json(); if (!response.ok) throw new Error(data.detail || '活动历史读取失败');
+      const list = document.getElementById('activityHistory'); list.replaceChildren();
+      (data.items || []).forEach(project => {
+        const button = document.createElement('button'); button.type = 'button'; button.className = `project-link${project.id === activeProjectId ? ' active' : ''}`;
+        const title = document.createElement('strong'); title.textContent = project.title;
+        const meta = document.createElement('small'); meta.textContent = `${({brainstorm:'Brainstorm',planning:'策划',content:'内容制作'})[project.stage] || '活动'} · ${new Date(project.updated_at).toLocaleDateString('zh-CN')}`;
+        button.append(title, meta); button.addEventListener('click', () => openProject(project.id).catch(error => { document.getElementById('projectSaveStatus').textContent = error.message; })); list.append(button);
+      });
+      return data.items || [];
+    }
+
+    function showPlanningDocuments(documents) {
+      planningDocuments = documents || {};
+      for (const [key, id] of [['docx_url','planningDocxLink'],['pdf_url','planningPdfLink']]) {
+        const link = document.getElementById(id); link.hidden = !planningDocuments[key];
+        if (planningDocuments[key]) link.href = planningDocuments[key];
+      }
+    }
+
+    function currentLibraryQuery() {
+      let title = '';
+      try { title = JSON.parse(document.getElementById('planningOutput').value).title || ''; } catch (_) {}
+      return [document.getElementById('contentTheme').value, title, document.getElementById('contentAudience').value, document.getElementById('contentRequirements').value.slice(0, 250)].filter(Boolean).join(' ').trim();
+    }
+
+    function renderLibrary() {
+      const grid = document.getElementById('libraryGrid'); grid.replaceChildren();
+      for (const item of libraryCandidates) {
+        const card = document.createElement('div'); card.className = 'library-card';
+        const image = document.createElement('img'); image.src = item.preview_url; image.alt = item.label; image.loading = 'lazy'; card.append(image);
+        const label = document.createElement('label'); const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = librarySelectedIds.includes(item.id) || item.media_role === 'school_brand'; checkbox.disabled = item.media_role === 'school_brand';
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked && librarySelectedIds.length >= 4) { checkbox.checked = false; document.getElementById('libraryStatus').textContent = '最多选择 4 张图片。'; return; }
+          librarySelectedIds = checkbox.checked ? [...librarySelectedIds, item.id] : librarySelectedIds.filter(id => id !== item.id);
+          libraryInitialized = true; document.getElementById('libraryStatus').textContent = `已选择 ${librarySelectedIds.length} 张；可继续拖入本次活动照片。`; scheduleProjectSave();
+        });
+        const name = document.createElement('span'); name.textContent = item.label; label.append(checkbox, name); card.append(label);
+        const type = document.createElement('small'); type.textContent = item.media_role === 'school_brand' ? '学校学院 · 首尾固定' : item.media_role === 'transition_icon' ? '过渡图标 · 正文可用' : '学院素材 · 可复用'; card.append(type);
+        if (item.source_url) { const source = document.createElement('a'); source.href = item.source_url; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = '查看原推送'; card.append(source); }
+        grid.append(card);
+      }
+      document.getElementById('libraryStatus').textContent = libraryCandidates.length ? `找到 ${libraryCandidates.length} 张候选，已选择 ${librarySelectedIds.length} 张供模型参考。` : '没有找到相关图片，可调整主题后重新推荐。';
+    }
+
+    async function loadLibrarySuggestions(resetSelection = false) {
+      const query = currentLibraryQuery();
+      if (!resetSelection && libraryInitialized && libraryQuery === query) return;
+      document.getElementById('libraryStatus').textContent = '正在检索本地素材…';
+      const response = await apiFetch(`/api/library/images?q=${encodeURIComponent(query)}&limit=12${resetSelection ? '&refresh=true' : ''}`);
+      const data = await response.json(); if (!response.ok) throw new Error(data.detail || '本地素材检索失败');
+      libraryCandidates = data.items || [];
+      librarySelectedIds = resetSelection || !libraryInitialized ? (data.suggested_ids || []).slice(0, 4) : librarySelectedIds.filter(id => libraryCandidates.some(item => item.id === id));
+      libraryQuery = query; libraryInitialized = true; renderLibrary(); scheduleProjectSave();
+    }
+
+    async function loadLibraryTemplates() {
+      const select = document.getElementById('contentTemplate'); if (!select || libraryTemplates.length) return;
+      const response = await apiFetch(`/api/library/templates?q=${encodeURIComponent(currentLibraryQuery())}&limit=12`);
+      const data = await response.json(); if (!response.ok) throw new Error(data.detail || '历史模板读取失败');
+      libraryTemplates = data.items || [];
+      for (const item of libraryTemplates) { const option = document.createElement('option'); option.value = item.template_id; option.textContent = `${item.label}（${item.image_count}图/${item.section_count}节）`; select.append(option); }
+    }
+
+    function resetActivityForm() {
+      restoringProject = true;
+      workspaceFields.forEach(id => { document.getElementById(id).value = id === 'planningStyle' ? '清晰、稳妥、可执行' : id === 'planningTemplate' ? 'auto' : ''; });
+      ['brainstorm','planning','content'].forEach(stage => { activityAttachments[stage] = []; renderAttachments(stage); document.getElementById(`${stage}Result`).hidden = true; });
+      ['brainstorm','planning','content'].forEach(stage => { document.getElementById(`${stage}Error`).hidden = true; document.getElementById(`${stage}Meta`).textContent = ''; });
+      ['brainstormEditor','planningEditor','contentOutput','brainstormAdvisorLog'].forEach(id => document.getElementById(id).replaceChildren());
+      advisorHistory.length = 0; contentDraft = null; brainstormDraft = ''; planningDraft = '';
+      libraryCandidates = []; librarySelectedIds = []; libraryTemplates = []; libraryInitialized = false; libraryQuery = ''; document.getElementById('contentTemplate').replaceChildren(new Option('由 Agent 按主题选择', '')); renderLibrary();
+      showPlanningDocuments({});
+      document.querySelectorAll('#contentOptions input').forEach(input => { input.checked = input.value === 'push'; });
+      setActivityStage('brainstorm'); restoringProject = false;
+    }
+
+    async function newActivity() {
+      if (activeProjectId) await saveProjectNow();
+      activeProjectId = null; resetActivityForm();
+      await ensureProject(); setMode('push');
+      document.getElementById('projectSaveStatus').textContent = '新活动已建立';
+    }
+
+    async function openProject(id) {
+      if (activeProjectId === id) { setMode('push'); return; }
+      if (activeProjectId) await saveProjectNow();
+      const response = await apiFetch(`/api/activity/projects/${id}`);
+      const data = await response.json(); if (!response.ok) throw new Error(data.detail || '活动读取失败');
+      resetActivityForm(); restoringProject = true;
+      activeProjectId = id; localStorage.setItem('coe_active_project', id);
+      const state = data.state || {};
+      for (const [field, value] of Object.entries(state.fields || {})) if (document.getElementById(field)) document.getElementById(field).value = value;
+      for (const [field, value] of Object.entries(state.meta || {})) if (document.getElementById(field)) document.getElementById(field).textContent = value;
+      for (const stage of ['brainstorm','planning','content']) { activityAttachments[stage] = state.attachments?.[stage] || []; renderAttachments(stage); }
+      for (const stage of ['brainstorm','planning']) {
+        const raw = document.getElementById(`${stage}Output`).value.trim();
+        if (raw) { try { renderStructuredEditor(stage, JSON.parse(raw)); document.getElementById(`${stage}Result`).hidden = false; } catch (_) {} }
+      }
+      contentDraft = state.content_result || null;
+      if (contentDraft) renderContentResults(contentDraft);
+      document.querySelectorAll('#contentOptions input').forEach(input => { input.checked = (state.content_types || []).includes(input.value); });
+      showPlanningDocuments(state.planning_documents || {});
+      advisorHistory.length = 0; advisorHistory.push(...(state.advisor_history || []));
+      for (const turn of advisorHistory) addAdvisorMessage(turn.role, turn.content);
+      libraryCandidates = state.library_candidates || []; librarySelectedIds = state.library_selected_ids || [];
+      libraryInitialized = !!state.library_initialized; libraryQuery = state.library_query || ''; renderLibrary();
+      setActivityStage(state.stage || 'brainstorm'); setMode('push');
+      restoringProject = false; document.getElementById('projectSaveStatus').textContent = '已载入';
+      if (activeStage === 'content') { if (!libraryInitialized) loadLibrarySuggestions().catch(error => { document.getElementById('libraryStatus').textContent = error.message; }); loadLibraryTemplates().catch(() => {}); }
+      await loadProjectList();
+    }
+
+    function attachmentPayload(stage) { return activityAttachments[stage].map(({name, mime_type, size, text, data_url, usage, placement}) => ({name, mime_type, size, text, data_url, usage, placement})); }
+
+    function renderAttachments(stage) {
+      const target = document.getElementById(`${stage}Attachments`); if (!target) return;
+      target.replaceChildren();
+      activityAttachments[stage].forEach((file, index) => {
+        const chip = document.createElement('span'); chip.className = 'attachment-chip';
+        chip.append(document.createTextNode(`${file.name} · ${Math.ceil(file.size / 1024)}KB${file.size > 12000000 ? ' · 超过 12MB，请压缩后重传' : ''}`));
+        if (file.mime_type?.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
+          const usage = document.createElement('input'); usage.className = 'attachment-usage'; usage.placeholder = '如何使用（可选）'; usage.value = file.usage || '';
+          usage.addEventListener('input', () => { file.usage = usage.value; scheduleProjectSave(); });
+          const placement = document.createElement('select'); placement.className = 'attachment-placement';
+          [['auto','自动'],['首图','首图'],['正文','正文'],['尾图','尾图']].forEach(([value, label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; option.selected = (file.placement || 'auto') === value; placement.append(option); });
+          placement.addEventListener('change', () => { file.placement = placement.value; scheduleProjectSave(); });
+          chip.append(usage, placement);
+        }
+        const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '×';
+        remove.addEventListener('click', () => { activityAttachments[stage].splice(index, 1); renderAttachments(stage); scheduleProjectSave(); });
+        chip.append(remove); target.append(chip);
+      });
+    }
+
+    async function readDroppedFile(file) {
+      const item = {name:file.name, mime_type:file.type || 'application/octet-stream', size:file.size, text:'', data_url:'', usage:'', placement:'auto'};
+      if (file.type.startsWith('text/') || /\.(txt|md|csv|json|srt|vtt)$/i.test(file.name)) {
+        item.text = (await file.text()).slice(0, 30000);
+      } else if ((file.type.startsWith('image/') || /\.(pdf|docx|xlsx|pptx|odt|ods|odp)$/i.test(file.name)) && file.size <= 12000000) {
+        item.data_url = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); });
+      }
+      return item;
+    }
+
+    async function addAttachments(stage, files) {
+      const accepted = [...files].filter(file => file.size <= 12000000).slice(0, 12 - activityAttachments[stage].length);
+      const oversized = [...files].filter(file => file.size > 12000000);
+      const items = await Promise.all(accepted.map(readDroppedFile));
+      activityAttachments[stage].push(...items); renderAttachments(stage);
+      scheduleProjectSave();
+      if (oversized.length) {
+        const note = document.createElement('span'); note.className = 'attachment-chip';
+        note.textContent = `${oversized.length} 个文件超过 12MB，未加入`;
+        document.getElementById(`${stage}Attachments`).append(note);
+      }
+    }
+
+    function setupDropzones() {
+      document.querySelectorAll('.dropzone').forEach(zone => {
+        const stage = zone.dataset.dropzone; const picker = zone.querySelector('input');
+        zone.addEventListener('click', event => { if (event.target !== picker) picker.click(); });
+        picker.addEventListener('change', event => addAttachments(stage, event.target.files));
+        zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('dragover'); });
+        zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+        zone.addEventListener('drop', event => { event.preventDefault(); zone.classList.remove('dragover'); addAttachments(stage, event.dataTransfer.files); });
+      });
+    }
+
+    function setActivityStage(stage) {
+      activeStage = stage;
+      for (const section of document.querySelectorAll('.activity-stage')) section.hidden = section.id !== `${stage}Stage`;
+      for (const button of document.querySelectorAll('.activity-step')) button.classList.toggle('active', button.dataset.stage === stage);
+      document.getElementById('scroll').scrollTop = 0;
+      scheduleProjectSave();
+      if (stage === 'content' && !restoringProject && !libraryInitialized) { loadLibrarySuggestions().catch(error => { document.getElementById('libraryStatus').textContent = error.message; }); loadLibraryTemplates().catch(() => {}); }
+    }
+
+    function prettyJson(value) {
+      return JSON.stringify(value, null, 2);
+    }
+
+    function editorValue(value) {
+      if (Array.isArray(value)) return value.map(item => typeof item === 'object' ? JSON.stringify(item) : String(item)).join('\n');
+      return value && typeof value === 'object' ? prettyJson(value) : String(value ?? '');
+    }
+
+    function editorCard(title, hint = '') {
+      const card = document.createElement('div'); card.className = 'editor-card';
+      const heading = document.createElement('h4'); heading.textContent = title; card.append(heading);
+      if (hint) { const note = document.createElement('p'); note.className = 'editor-hint'; note.textContent = hint; card.append(note); }
+      return card;
+    }
+
+    function editorControl(label, value, update, wide = false, multiline = true, choices = null) {
+      const field = document.createElement('div'); field.className = `editor-field${wide ? ' wide' : ''}`;
+      const caption = document.createElement('label'); caption.textContent = label; field.append(caption);
+      const control = choices ? document.createElement('select') : multiline ? document.createElement('textarea') : document.createElement('input');
+      if (choices) choices.forEach(([code, title]) => { const option = document.createElement('option'); option.value = code; option.textContent = title; control.append(option); });
+      control.value = editorValue(value); control.addEventListener('input', () => update(control.value)); field.append(control);
+      return field;
+    }
+
+    function renderStructuredEditor(stage, result) {
+      const state = JSON.parse(JSON.stringify(result || {}));
+      const root = document.getElementById(stage === 'brainstorm' ? 'brainstormEditor' : 'planningEditor');
+      const raw = document.getElementById(stage === 'brainstorm' ? 'brainstormOutput' : 'planningOutput');
+      root.replaceChildren();
+      const sync = () => { raw.value = prettyJson(state); };
+      const change = key => text => {
+        if (Array.isArray(state[key])) state[key] = text.split('\n').map(line => line.trim()).filter(Boolean).map(line => {
+          if (line.startsWith('{')) { try { return JSON.parse(line); } catch (_) {} }
+          return line;
+        });
+        else state[key] = text;
+        sync();
+      };
+      const labels = {summary:'活动摘要',suggested_activity_name:'建议名称',people:'参与人员',time:'时间',location:'地点',audience:'面向对象',goals:'活动目标',constraints:'限制条件',open_questions:'待确认问题',title:'活动名称',objective:'活动目标',key_message:'核心信息',schedule:'时间安排',workflow:'活动流程',task_assignments:'任务分工',materials:'所需物资',promotion_plan:'宣传安排',risk_controls:'风险与应对',budget_or_resources:'预算与资源',review_checklist:'审核清单'};
+      if (stage === 'brainstorm') {
+        const overview = editorCard('活动概览'); const grid = document.createElement('div'); grid.className = 'editor-grid';
+        ['suggested_activity_name','summary'].forEach(key => grid.append(editorControl(labels[key], state[key], change(key), key === 'summary', key === 'summary')));
+        overview.append(grid); root.append(overview);
+        const facts = editorCard('关键事实', '逐条核对内容、确认状态和证据，修改会同步到下一步。');
+        (Array.isArray(state.facts) ? state.facts : []).forEach((fact, index) => {
+          const item = document.createElement('div'); item.className = 'fact-card'; const row = document.createElement('div'); row.className = 'editor-grid';
+          const set = key => text => { state.facts[index][key] = text; sync(); };
+          row.append(editorControl('字段', fact.field, set('field'), false, false), editorControl('内容', fact.value, set('value'), false, false), editorControl('状态', fact.status || 'uncertain', set('status'), false, false, [['confirmed','已确认'],['uncertain','待确认'],['missing','缺失']]));
+          row.append(editorControl('证据 / 原句', fact.evidence, set('evidence'), true)); item.append(row); facts.append(item);
+        });
+        root.append(facts);
+      }
+      const keys = stage === 'brainstorm' ? ['people','time','location','audience','goals','constraints','open_questions'] : ['title','objective','audience','key_message','schedule','workflow','task_assignments','materials','promotion_plan','risk_controls','budget_or_resources','open_questions','review_checklist'];
+      if (stage === 'planning' && Array.isArray(state.document_sections)) {
+        state.document_sections.forEach((section, index) => {
+          const card = editorCard(`正文第 ${index + 1} 节`);
+          const sectionGrid = document.createElement('div'); sectionGrid.className = 'editor-grid';
+          sectionGrid.append(editorControl('章节标题', section.heading, text => { section.heading = text; sync(); }, true, false));
+          sectionGrid.append(editorControl('正文', section.body, text => { section.body = text; sync(); }, true));
+          if (section.table && Array.isArray(section.table.headers)) {
+            sectionGrid.append(editorControl('表格列名（用 | 分隔）', section.table.headers.join(' | '), text => { section.table.headers = text.split('|').map(x => x.trim()); sync(); }, true, false));
+            sectionGrid.append(editorControl('表格内容（每行一条，列用 | 分隔）', (section.table.rows || []).map(row => row.join(' | ')).join('\n'), text => { section.table.rows = text.split('\n').filter(Boolean).map(line => line.split('|').map(x => x.trim())); sync(); }, true));
+          }
+          card.append(sectionGrid); root.append(card);
+        });
+      }
+      const details = editorCard(stage === 'brainstorm' ? '其他信息与待确认项' : '传给第三步的结构化要点', stage === 'brainstorm' ? '所有字段可直接修改。列表内容每行一条。' : 'Word/PDF 使用上方“正文第 N 节”；这里的字段供推送、海报等内容制作使用。');
+      const grid = document.createElement('div'); grid.className = 'editor-grid';
+      keys.forEach(key => grid.append(editorControl(labels[key] || key, state[key], change(key), Array.isArray(state[key]) || key === 'objective' || key === 'key_message')));
+      details.append(grid); root.append(details); sync(); raw.setCustomValidity('');
+    }
+
+    async function runBrainstorm() {
+      const button = document.getElementById('brainstormButton');
+      const raw = document.getElementById('brainstormInput').value.trim();
+      if ((raw.length < 10 && !activityAttachments.brainstorm.length) || button.disabled) return;
+      button.disabled = true; button.textContent = '正在整理关键信息…';
+      document.getElementById('brainstormError').hidden = true;
+      try {
+        await ensureProject();
+        const response = await apiFetch('/api/activity/brainstorm', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({raw_input: raw, extra_context: document.getElementById('brainstormExtra').value.trim(), attachments: attachmentPayload('brainstorm')})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || '消息整合失败');
+        brainstormDraft = prettyJson(data.result);
+        renderStructuredEditor('brainstorm', data.result);
+        document.getElementById('brainstormMeta').textContent = `${data.agent.agent_label} · ${data.model}`;
+        document.getElementById('brainstormResult').hidden = false;
+        await saveProjectNow();
+      } catch (error) { const box = document.getElementById('brainstormError'); box.textContent = error.message; box.hidden = false; }
+      finally { button.disabled = false; button.textContent = '整理关键信息'; }
+    }
+
+    async function runPlanning() {
+      const button = document.getElementById('planningButton');
+      const facts = document.getElementById('planningBrainstorm').value.trim();
+      if (facts.length < 10 || button.disabled) return;
+      button.disabled = true; button.textContent = '正在生成策划案…';
+      document.getElementById('planningError').hidden = true;
+      try {
+        const projectId = await ensureProject();
+        const response = await apiFetch('/api/activity/plan', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({brainstorm: facts, additions: document.getElementById('planningAdditions').value.trim(), style: document.getElementById('planningStyle').value.trim(), template: document.getElementById('planningTemplate').value, project_id: projectId, attachments: attachmentPayload('planning')})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || '策划案生成失败');
+        planningDraft = prettyJson(data.result);
+        renderStructuredEditor('planning', data.result);
+        document.getElementById('planningMeta').textContent = `${data.agent.agent_label} · ${data.model} · ${data.template_label} · 参考 ${data.sources.length} 篇历史文章`;
+        showPlanningDocuments(data.documents);
+        document.getElementById('planningResult').hidden = false;
+        if (data.export_error) { const box = document.getElementById('planningError'); box.textContent = data.export_error; box.hidden = false; }
+        await saveProjectNow();
+      } catch (error) { const box = document.getElementById('planningError'); box.textContent = error.message; box.hidden = false; }
+      finally { button.disabled = false; button.textContent = '生成策划案'; }
+    }
+
+    async function refreshPlanningDocuments() {
+      const button = document.getElementById('refreshPlanDocuments');
+      const box = document.getElementById('planningError'); box.hidden = true;
+      if (button.disabled) return;
+      let plan;
+      try { plan = JSON.parse(document.getElementById('planningOutput').value); }
+      catch (_) { box.textContent = '策划案 JSON 格式有误，请先修正。'; box.hidden = false; return; }
+      button.disabled = true; button.textContent = '正在导出…';
+      try {
+        const projectId = await ensureProject();
+        const response = await apiFetch('/api/activity/plan/export', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({project_id:projectId,plan})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '策划案导出失败');
+        showPlanningDocuments(data); await saveProjectNow();
+      } catch (error) { box.textContent = error.message; box.hidden = false; }
+      finally { button.disabled = false; button.textContent = '按当前修改重新导出'; }
+    }
+
+    function renderContentResults(data) {
+      contentDraft = data;
+      const output = document.getElementById('contentOutput'); output.replaceChildren();
+      for (const item of data.result.items || []) {
+        const card = document.createElement('div'); card.className = 'content-result-card';
+        const title = document.createElement('strong'); title.textContent = `${item.agent.agent_label} · ${item.model}`; card.append(title);
+        const summary = document.createElement('p'); summary.textContent = JSON.stringify(item.result, null, 2); card.append(summary);
+        if (item.preview_url) { const link = document.createElement('a'); link.href = item.preview_url; link.target = '_blank'; link.textContent = '打开图文推送 HTML 预览'; card.append(link); }
+        if ((item.embedded_assets || []).length) { const note = document.createElement('p'); note.textContent = `已加入本地图片：${item.embedded_assets.map(asset => asset.label).join('、')}`; card.append(note); }
+        output.append(card);
+      }
+      document.getElementById('contentMeta').textContent = `已生成 ${data.result.items.length} 项 · 参考本地图片 ${(data.result.library_assets || []).length} 张`;
+      if ((data.result.library_warnings || []).length) {
+        const warning = document.createElement('p'); warning.textContent = `部分素材未能读取：${data.result.library_warnings.join('；')}`; output.prepend(warning);
+      }
+      document.getElementById('contentResult').hidden = false;
+      scheduleProjectSave();
+    }
+
+    async function runContent() {
+      const button = document.getElementById('contentButton');
+      const planning = document.getElementById('planningOutput').value.trim();
+      const types = [...document.querySelectorAll('#contentOptions input:checked')].map(input => input.value);
+      if (planning.length < 10 || !types.length || button.disabled) return;
+      button.disabled = true; button.textContent = '正在制作所选内容…';
+      document.getElementById('contentError').hidden = true;
+      try {
+        await ensureProject();
+        if (!libraryInitialized) await loadLibrarySuggestions();
+        const response = await apiFetch('/api/activity/content', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({planning, content_types: types, theme: document.getElementById('contentTheme').value.trim(), audience: document.getElementById('contentAudience').value.trim(), requirements: document.getElementById('contentRequirements').value.trim(), reviewer: document.getElementById('contentReviewer').value.trim(), attachments: attachmentPayload('content'), library_asset_ids: librarySelectedIds, template_id: document.getElementById('contentTemplate').value})
+        });
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '内容制作失败');
+        renderContentResults(data);
+        await saveProjectNow();
+      } catch (error) { const box = document.getElementById('contentError'); box.textContent = error.message; box.hidden = false; }
+      finally { button.disabled = false; button.textContent = '生成所选内容'; }
+    }
+
+    const advisorHistory = [];
+    function currentActivityContext() {
+      return [
+        `当前页面：办一场活动`,
+        `Brainstorm 原始资料：${document.getElementById('brainstormInput')?.value || '[未填写]'}`,
+        `Brainstorm 底稿：${document.getElementById('brainstormOutput')?.value || '[未生成]'}`,
+        `策划案：${document.getElementById('planningOutput')?.value || '[未生成]'}`,
+        `策划补充：${document.getElementById('planningAdditions')?.value || '[未填写]'}`,
+        `内容选择：${[...document.querySelectorAll('#contentOptions input:checked')].map(x => x.value).join('、') || '[未选择]'}`,
+        `内容要求：${document.getElementById('contentRequirements')?.value || '[未填写]'}`,
+        `拖入素材：${Object.entries(activityAttachments).flatMap(([stage, files]) => files.map(file => `${stage}/${file.name}`)).join('、') || '[没有]'}`,
+        `本地图片素材：${libraryCandidates.filter(item => librarySelectedIds.includes(item.id)).map(item => item.label).join('、') || '[没有]'}`
+      ].join('\n');
+    }
+
+    function addAdvisorMessage(role, text) {
+      const log = document.getElementById('brainstormAdvisorLog'); const item = document.createElement('div');
+      item.className = `side-brainstorm-msg ${role}`; item.textContent = text; log.append(item); log.scrollTop = log.scrollHeight;
+    }
+
+    async function askBrainstormAdvisor(message) {
+      const input = document.getElementById('brainstormAdvisorInput'); const button = document.querySelector('#brainstormAdvisorForm button');
+      if (!message || button.disabled) return;
+      addAdvisorMessage('user', message); input.value = ''; button.disabled = true;
+      try {
+        const response = await apiFetch('/api/activity/brainstorm/chat', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({message, context:currentActivityContext(), history:advisorHistory.slice(-10)})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || 'Brainstorm 建议失败');
+        addAdvisorMessage('assistant', data.answer); advisorHistory.push({role:'user',content:message},{role:'assistant',content:data.answer}); scheduleProjectSave();
+      } catch (error) { addAdvisorMessage('assistant', error.message); }
+      finally { button.disabled = false; input.focus(); }
+    }
 
     function readSelectedImages() {
       const files = [...(document.getElementById('imagePool').files || [])].slice(0, 12);
@@ -321,7 +935,7 @@
       document.getElementById('xiumiActions').replaceChildren();
       try {
         const assets = await readSelectedImages();
-        const response = await fetch('/api/generate-xiumi-push', {
+        const response = await apiFetch('/api/generate-xiumi-push', {
           method: 'POST', headers: {'Content-Type':'application/json'},
           body: JSON.stringify({
             event_time: document.getElementById('eventTime').value.trim(),
@@ -345,7 +959,8 @@
         const templateLabel = data.template_source && data.template_source.source_title
           ? `参考模板：${data.template_source.source_title}`
           : '参考模板：默认排版';
-        document.getElementById('draftMeta').textContent = `生成模型：${data.model} · ${templateLabel} · 图片素材：${(data.assets || []).length} 张 · 可继续人工修改`;
+        const agentLabel = data.agent && data.agent.agent_label ? data.agent.agent_label : '内容 Agent';
+        document.getElementById('draftMeta').textContent = `${agentLabel} · 生成模型：${data.model} · ${templateLabel} · 图片素材：${(data.assets || []).length} 张 · 可继续人工修改`;
         const visualPlan = document.getElementById('visualPlan');
         for (const asset of (data.assets || [])) {
           const card = document.createElement('div');
@@ -422,14 +1037,49 @@
       button.addEventListener('click', () => sendMessage(button.textContent.trim()));
     });
     document.getElementById('newChat').addEventListener('click', () => location.reload());
-    document.getElementById('newPush').addEventListener('click', () => setMode('push'));
+    document.getElementById('newPush').addEventListener('click', () => newActivity().catch(error => { document.getElementById('projectSaveStatus').textContent = error.message; }));
     document.getElementById('chatMode').addEventListener('click', () => setMode('chat'));
     document.getElementById('pushMode').addEventListener('click', () => setMode('push'));
-    document.getElementById('pushForm').addEventListener('submit', event => {
+    const legacyPushForm = document.getElementById('pushForm');
+    if (legacyPushForm) legacyPushForm.addEventListener('submit', event => {
       event.preventDefault();
       generatePush();
     });
-    document.getElementById('imagePool').addEventListener('change', event => {
+    document.querySelectorAll('.activity-step').forEach(button => button.addEventListener('click', () => setActivityStage(button.dataset.stage)));
+    document.getElementById('brainstormButton').addEventListener('click', runBrainstorm);
+    document.getElementById('toPlanningButton').addEventListener('click', () => {
+      if (!document.getElementById('brainstormOutput').checkValidity()) { document.getElementById('brainstormOutput').reportValidity(); return; }
+      document.getElementById('planningBrainstorm').value = document.getElementById('brainstormOutput').value.trim();
+      setActivityStage('planning');
+      document.getElementById('planningAdditions').focus();
+    });
+    document.getElementById('planningButton').addEventListener('click', runPlanning);
+    document.getElementById('refreshPlanDocuments').addEventListener('click', refreshPlanningDocuments);
+    document.getElementById('toContentButton').addEventListener('click', () => {
+      if (!document.getElementById('planningOutput').checkValidity()) { document.getElementById('planningOutput').reportValidity(); return; }
+      document.getElementById('contentTheme').value = document.getElementById('planningOutput').value.match(/"title"\s*:\s*"([^"]+)/)?.[1] || '';
+      setActivityStage('content');
+    });
+    document.getElementById('contentButton').addEventListener('click', runContent);
+    document.getElementById('refreshLibrary').addEventListener('click', () => loadLibrarySuggestions(true).catch(error => { document.getElementById('libraryStatus').textContent = error.message; }));
+    document.getElementById('brainstormAdvisorForm').addEventListener('submit', event => { event.preventDefault(); askBrainstormAdvisor(document.getElementById('brainstormAdvisorInput').value.trim()); });
+    generatorView.addEventListener('input', scheduleProjectSave);
+    generatorView.addEventListener('change', scheduleProjectSave);
+    document.querySelectorAll('.raw-toggle').forEach(button => button.addEventListener('click', () => {
+      const raw = document.getElementById(button.dataset.target);
+      const open = raw.classList.toggle('open');
+      button.textContent = open ? '收起原始 JSON' : '显示原始 JSON（高级编辑）';
+    }));
+    ['brainstorm','planning'].forEach(stage => {
+      const raw = document.getElementById(`${stage}Output`);
+      raw.addEventListener('change', () => {
+        try { renderStructuredEditor(stage, JSON.parse(raw.value)); raw.setCustomValidity(''); }
+        catch (_) { raw.setCustomValidity('JSON 格式有误，请检查后再继续。'); }
+      });
+    });
+    setupDropzones();
+    const legacyImagePool = document.getElementById('imagePool');
+    if (legacyImagePool) legacyImagePool.addEventListener('change', event => {
       const names = [...(event.target.files || [])].slice(0, 12).map(file => file.name);
       document.getElementById('imageNames').textContent = names.length
         ? `已选择 ${names.length} 张：${names.join('、')}`
@@ -457,6 +1107,13 @@
         notice.textContent = '聊天页面和本地文章检索已就绪。填写根目录 .env 文件中的 OPENAI_API_KEY 并重启后，即可调用 GPT-6 Sol。密钥不会发给浏览器。';
         notice.classList.add('visible');
       }
+      try {
+        const projects = await loadProjectList();
+        if (!activeProjectId && projects.length) {
+          const last = localStorage.getItem('coe_active_project');
+          await openProject(projects.find(item => item.id === last)?.id || projects[0].id);
+        }
+      } catch (error) { document.getElementById('projectSaveStatus').textContent = error.message; }
     }
 
     document.getElementById('accessForm').addEventListener('submit', async event => {
