@@ -1,91 +1,181 @@
 # 学生会推送档案助手
 
-这是一个本地运行的学生会公众号工作流助手，当前包含：
+这是一个本地运行的活动策划和公众号推送助手。它会读取本地历史推送数据库和图片素材，由 Brainstorm、策划、推送、海报、问卷、PPT 等 Agent 协作生成结果，并保留人工修改环节。
 
-- 公众号文章 URL 导入本地 SQLite 文章库；
-- 历史推送关键词检索和对话查询；
-- 使用历史文章作为参考生成活动推送；
-- 生成带图片素材和历史模板参考的秀米 HTML 预览；
-- 生成后可以复制 HTML 到秀米继续人工修改。
-- 按工作流阶段分配 GPT-6 Luna/Sol，并提供 Agent 注册表和流程清单；推送、海报、问卷、PPT 是四个并列下游 Agent。
+## 你需要准备的三样东西
 
-## 本地运行
+合作者第一次使用时，需要分别拿到：
 
-1. 安装 Python 3.11 或更新版本。
-2. 复制 `.env.example` 为 `.env`，选择模型厂商并填写你自己的 `LLM_API_KEY`。
-3. 双击 `启动推送助手.bat`，或运行：
+1. **GitHub 仓库**：程序代码、网页、Agent 配置和模板。
+2. **你发送的数据包**：历史推送数据库和指定图片素材。数据不在 GitHub 仓库中，因为 `data/` 被 `.gitignore` 忽略。
+3. **合作者自己的模型 API Key**：每个人在自己的电脑上配置，不共享、不提交到 GitHub。
 
-   ```powershell
-   python -m pip install -r requirements.txt
-   python launch_chat.py
-   ```
+建议发送一个压缩包，例如 `coe_shared.zip`。压缩包解压后应包含下面的结构：
 
-4. 浏览器打开 <http://127.0.0.1:8000>。
+```text
+coe_shared/
+├─ manifest.json
+└─ data/
+   ├─ articles.sqlite3       # 历史推送数据库
+   ├─ media/                 # 历史推送图片
+   ├─ articles/              # 历史文章预览
+   ├─ 学校学院/              # 固定首图、尾图和学院素材
+   └─ 过渡图标/              # 正文分隔图标
+```
 
-## 分享给同一局域网的人
+当前不建议发送 `activity_projects.sqlite3`。它保存本机“办一场活动”的草稿、附件和生成结果，可能包含个人输入；每位合作者应保留自己的活动历史。
 
-网页必须由你的电脑运行后端，不能只把 HTML 文件发给别人。当前仓库已取消访问码，局域网模式只适合可信网络；复制下面两行到本地 `.env`：
+## 合作者安装步骤
+
+### 1. 克隆代码
+
+```powershell
+git clone https://github.com/1mmerse1/coe_agent.git
+cd coe_agent
+```
+
+### 2. 放入你发送的数据
+
+把数据包中的 `data/` 文件夹复制到项目根目录。如果系统询问是否合并文件夹，选择合并；不要删除代码仓库中的其他文件。
+
+完成后，项目根目录应同时存在：
+
+```text
+coe_agent/
+├─ app.py
+├─ web/
+├─ .env.example
+└─ data/
+   ├─ articles.sqlite3
+   ├─ media/
+   ├─ 学校学院/
+   └─ 过渡图标/
+```
+
+### 3. 配置自己的模型 API Key
+
+复制配置模板：
+
+```powershell
+copy .env.example .env
+```
+
+然后用记事本打开 `.env`，至少填写以下四项：
+
+```text
+LLM_PROVIDER=deepseek
+LLM_API_KEY=你的Key
+LLM_BASE_URL=https://api.deepseek.com/v1
+LLM_MODEL=deepseek-chat
+```
+
+API Key 只写在本机 `.env`，不要发给其他人，也不要提交到 GitHub。后端读取 Key，浏览器不会接触 Key。
+
+## 支持的模型服务
+
+| 厂商 | `LLM_PROVIDER` | `LLM_BASE_URL` | `LLM_MODEL` 示例 | 接口模式 |
+|---|---|---|---|---|
+| OpenAI 官方 | `openai` | `https://api.openai.com/v1` | 账号可用的 GPT 模型 | `responses` |
+| OpenAI 兼容中转 | `aizex` | `https://codex-api.aizex.net/v1` | 中转站提供的模型名 | `responses` 或 `auto` |
+| DeepSeek | `deepseek` | `https://api.deepseek.com/v1` | `deepseek-chat` | `chat` 或 `auto` |
+| GLM | `glm` | `https://open.bigmodel.cn/api/paas/v4` | 账号可用的 GLM 模型 | `chat` 或 `auto` |
+
+如果服务商给了不同的地址或模型名，以服务商控制台为准。需要强制指定接口时，可设置：
+
+```text
+LLM_API_MODE=responses
+```
+
+或：
+
+```text
+LLM_API_MODE=chat
+```
+
+旧版本的 `OPENAI_API_KEY`、`OPENAI_BASE_URL`、`OPENAI_MODEL` 仍然兼容。OpenAI 官方文档建议把 API Key 放在环境变量或服务端密钥管理中，不要放进浏览器代码。[OpenAI API 快速开始](https://platform.openai.com/docs/quickstart/make-your-first-api-request)
+
+## 安装依赖并启动
+
+Windows 可以双击：
+
+```text
+启动推送助手.bat
+```
+
+也可以在 PowerShell 中运行：
+
+```powershell
+python -m pip install -r requirements.txt
+python launch_chat.py
+```
+
+浏览器打开：<http://127.0.0.1:8000>
+
+如果页面显示“等待配置 API 密钥”，检查 `.env` 是否位于项目根目录，并确认修改后重新启动了服务。
+
+## 工作流怎么用
+
+点击左侧“新建活动”，按以下顺序操作：
+
+1. **Brainstorm**：拖入群聊、PDF、Word、表格、图片等资料，整理出可编辑的活动关键信息。
+2. **策划**：补充要求，选择详细版、中等版、简洁版模板，生成可下载的 Word/PDF 策划案，人工修改后可重新导出。
+3. **内容制作**：按需勾选图文推送、海报、问卷、PPT，生成结果后人工复核。
+
+图片规则如下：
+
+- `data/学校学院/首图.*` 固定放在推送开头。
+- `data/学校学院/尾图.*` 固定放在推送结尾。
+- `data/过渡图标/` 作为正文分隔图标候选。
+- 往期推送图片只用于检索和排版模板参考，不作为本次活动配图。
+- 用户上传图片可以填写用途和位置，支持首图、正文、尾图或自动判断。
+
+## 你发送的数据包怎么生成
+
+如果需要从当前电脑重新导出一份共享数据包，在项目根目录运行：
+
+```powershell
+python export_shared_bundle.py --output D:\coe_shared
+```
+
+默认导出：
+
+- `data/articles.sqlite3`
+- `data/media/`
+- `data/articles/`
+- `data/学校学院/`
+- `data/过渡图标/`
+- `manifest.json` 和文件校验值
+
+需要增加其他素材文件夹时：
+
+```powershell
+python export_shared_bundle.py --output D:\coe_shared `
+  --folder 学校学院 --folder 过渡图标 --folder 迎新专用
+```
+
+数据包可以通过学院网盘、OneDrive 或对象存储发送。不要把含有 API Key、活动草稿或个人附件的数据包上传到公开位置。
+
+## 局域网访问
+
+如果只想让同一局域网的人访问你电脑上运行的服务，在 `.env` 中设置：
 
 ```text
 APP_HOST=0.0.0.0
 APP_PORT=8000
 ```
 
-重启 `启动推送助手.bat` 后，启动窗口会显示一个局域网地址，例如 `http://192.168.1.23:8000`。把地址发给同一局域网的人即可。每个合作者应在自己 clone 的项目中配置自己的模型 API Key；API Key 只在该电脑后端使用，不会发给浏览器。
+然后重启服务，启动窗口会显示局域网地址。当前版本已取消访问码，因此只建议在可信局域网中使用；合作者仍然可以各自 clone 仓库、放入同一份数据包，并使用自己的 API Key 独立运行。
 
-如果别人无法打开，确认两台电脑在同一个 Wi-Fi 或局域网，并在 Windows 防火墙提示时允许 Python 在“专用网络”通信。不要把 `APP_HOST=0.0.0.0` 的服务直接暴露到公网；需要公网访问时，应放到有 HTTPS、登录和反向代理的服务器上。
+## 数据和代码的边界
 
-## 导入公众号文章
+- GitHub：程序代码、网页、模板、提示词和导出脚本。
+- 你发送的数据包：历史推送数据库、历史图片和指定素材。
+- 每台电脑本地：API Key、活动草稿、上传附件、生成的 Word/PDF/HTML。
 
-把公众号文章链接逐行放进 `推送URL_test.txt`，运行 `开始导入.bat`。文章数据库、图片和预览会保存在本地 `data/` 目录，该目录默认不会提交到 GitHub。
+SQLite 适合每个人各自使用一份只读历史数据库。多人同时修改同一份活动记录时，不要把 SQLite 文件放在共享文件夹里；以后如果需要多人实时编辑，再升级到 PostgreSQL 加对象存储。
 
-## 生成秀米预览
+更多内容见：
 
-在网页中点击“办活动”进入工作台，点击左侧“新建活动”创建新记录，按 Brainstorm → 策划 → 内容制作三步推进。第一步整理长篇对话总结/群聊消息，第二步结合补充信息生成策划案，第三步可选生成图文推送、海报、问卷或 PPT。图文推送会生成秀米 HTML 和本地预览页面。旧的 `POST /api/generate-push-html` 和 `/api/generate-xiumi-push` 仍兼容。
-
-活动各阶段支持拖入 TXT、Markdown、CSV、JSON、PDF、DOCX、XLSX、PPTX、ODT、ODS、ODP 和图片。常见文档由本地服务提取文字；扫描版 PDF 的前 6 页会作为页面图像送给视觉模型。单文件上限 12 MB，文本只截取前 6000 字进入当前 Agent 提示词。Brainstorm 底稿以可编辑卡片呈现，修改后同步到下一阶段；高级编辑可展开原始 JSON。左侧的 Brainstorm 建议 Agent 会读取当前页面已填写的资料、关键信息、策划案和内容要求，回答活动创意与下一步建议。
-
-“办一场活动”会自动保存到本地活动历史。左侧可新建或切换活动，保存输入、附件、Brainstorm 底稿、策划案及内容制作结果。策划阶段可选详细版（新生手册类）、中等版（交流会类）、简洁版（图书漂流类），也可由 Agent 自动匹配。三份策划案范例和编写要求保存在 `resources/planning_templates/`，只作为结构与写法参考。生成策划案时同时生成可下载的 Word 和 PDF；人工修改页面正文后，可点击“按当前修改重新导出”。活动数据库、素材和导出文件保存在本地 `data/` 目录。
-
-内容制作阶段会根据活动名称检索 `data/` 中的学院图片素材，页面显示缩略图与出处，默认推荐少量图片，可勾选或取消。勾选图片由本地服务转成较小的 JPEG 预览后发给图文、海报和 PPT Agent，无须重复上传。JPG、PNG、GIF、WebP、可读取的 PSD，以及内含 PDF 预览的 AI 文件可供检索；无法生成预览的设计源文件需先导出 JPG/PNG。历史推送图片保留在文章库中用于检索和排版模板提取，不会作为本次活动配图。推送 Agent 可以从已勾选的学院素材中选图，后端核对后嵌入 HTML。
-
-素材规则：`data/学校学院/首图.*` 和 `data/学校学院/尾图.*` 是推送固定首图、尾图；`data/过渡图标/` 只作为正文分隔图标候选，历史推送图片暂不作为本次配图。用户上传图片时可以填写用途和位置。历史推送排版模板可从文章 HTML 中提取多种样式，模板只包含排版属性，不包含往期事实。
-
-Agent 会从本地历史文章中选择相似排版风格，生成带行内样式的 HTML。打开预览后可以复制 HTML 到秀米，再进行人工修改和审核。
-
-## 配置说明
-
-旧接口默认模型仍是 `gpt-6-sol`，推理强度为 `high`。工作流接口使用：
-
-- `gpt-6-luna`：消息整合、历史检索、海报字段、问卷等高频结构化任务；
-- `gpt-6-sol`：策划案、推送 HTML、PPT 叙事、活动总结对照和发布前复核。
-
-当前 Luna 暂时不可用，原本分配给 Luna 的角色已临时映射到 `gpt-6-sol` + `low`。复杂 Agent 继续使用 `gpt-6-sol` + `high`。每个 clone 都可以独立配置以下模型厂商：
-
-| `LLM_PROVIDER` | `LLM_BASE_URL` 示例 | `LLM_API_MODE` | 模型示例 |
-|---|---|---|---|
-| `openai` | `https://api.openai.com/v1` | `responses` | 账号可用的 GPT 模型 |
-| `aizex` | `https://codex-api.aizex.net/v1` | `responses` 或 `auto` | 中转站提供的模型名 |
-| `deepseek` | `https://api.deepseek.com/v1` | `chat` 或 `auto` | `deepseek-chat` |
-| `glm` | `https://open.bigmodel.cn/api/paas/v4` | `chat` 或 `auto` | 账号可用的 GLM 模型 |
-
-配置示例：
-
-```text
-LLM_PROVIDER=deepseek
-LLM_API_KEY=你的 DeepSeek Key
-LLM_BASE_URL=https://api.deepseek.com/v1
-LLM_API_MODE=auto
-LLM_MODEL=deepseek-chat
-```
-
-OpenAI 官方 SDK 使用服务端 API Key；OpenAI 官方文档也要求 API Key 保存在环境变量或密钥管理服务中，不要放入浏览器代码。[官方 OpenAI API 快速开始](https://platform.openai.com/docs/quickstart/make-your-first-api-request)
-程序会根据厂商自动选择 Responses API 或 Chat Completions；也可以用 `LLM_API_MODE=responses` 或 `chat` 强制指定。旧的 `OPENAI_API_KEY`、`OPENAI_BASE_URL` 和 `OPENAI_MODEL` 变量仍兼容。真实密钥只放在本地 `.env`，不要提交到仓库。
-
-完整的阶段、输入输出合同和人工卡点见 [工作流Agent分工方案.md](工作流Agent分工方案.md)。管理页面可通过 `GET /api/workflow/manifest` 读取流程定义。
-
-`POST /api/workflow/route` 接收 `{"task_type":"push|poster|survey|ppt"}`，返回对应的并列 Agent 和模型配置。
-
-本地自动重载、接口测试和秀米 HTML 预览调试步骤见 [本地调试说明.md](本地调试说明.md)。
-
-历史推送数据库和部分图片素材的共享方式见 [数据库共享方案.md](数据库共享方案.md)。可以运行 `python export_shared_bundle.py --output D:\coe_shared` 导出一个不含密钥和活动草稿的共享数据包。
+- [数据库共享方案.md](数据库共享方案.md)
+- [本地调试说明.md](本地调试说明.md)
+- [工作流Agent分工方案.md](工作流Agent分工方案.md)
