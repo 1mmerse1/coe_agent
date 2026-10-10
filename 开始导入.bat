@@ -23,9 +23,9 @@ if errorlevel 1 (
 )
 
 if "%~1"=="" (
-  python -X utf8 -u importer.py import
+  python -X utf8 -u "src\importer.py" import
 ) else (
-  python -X utf8 -u importer.py import "%~1"
+  python -X utf8 -u "src\importer.py" import "%~1"
 )
 set "IMPORT_EXIT=%ERRORLEVEL%"
 echo.

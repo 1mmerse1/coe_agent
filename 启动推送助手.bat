@@ -24,7 +24,7 @@ if errorlevel 1 (
   )
 )
 
-"%COE_PYTHON%" -X utf8 launch_chat.py
+"%COE_PYTHON%" -X utf8 "src\launch_chat.py"
 if errorlevel 1 (
   echo.
   echo 推送助手启动失败。请保留此窗口中的错误信息。
