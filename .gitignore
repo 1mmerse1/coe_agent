@@ -4,6 +4,9 @@ __pycache__/
 .venv/
 data/
 
+# Historical article exports are shared separately with the data bundle.
+resources/article_reference/
+
 # Local editor and generated files
 *.log
 .DS_Store

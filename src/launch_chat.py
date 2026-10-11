@@ -7,15 +7,15 @@ import urllib.request
 import webbrowser
 import os
 import socket
-from pathlib import Path
 from threading import Thread
 
 from dotenv import load_dotenv
 import uvicorn
 
+from paths import ENV_FILE
 
-ROOT = Path(__file__).resolve().parent
-load_dotenv(ROOT / ".env")
+
+load_dotenv(ENV_FILE)
 HOST = os.getenv("APP_HOST", "127.0.0.1").strip() or "127.0.0.1"
 PORT = int(os.getenv("APP_PORT", "8000"))
 

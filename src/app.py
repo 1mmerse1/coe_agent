@@ -38,16 +38,15 @@ from local_media_library import media_role, recommended_images, resolve_images, 
 from workflow_framework import get_policy, manifest as workflow_manifest
 
 
-ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
-WEB_DIR = ROOT / "web"
+from paths import DATA_DIR, ENV_FILE, GUIDELINES_PATH, WEB_DIR
+
+
 ARTICLE_PREVIEW_DIR = DATA_DIR / "articles"
 GRAPHIC_PREVIEW_DIR = DATA_DIR / "graphic_previews"
 GENERATED_IMAGE_DIR = DATA_DIR / "generated_images"
 ASSET_DIR = DATA_DIR / "assets"
-GUIDELINES_PATH = ROOT / "推送Agent最高层指示.md"
 PUSH_GUIDELINE_SOURCE_URL = "https://mp.weixin.qq.com/s/4wF6gq3Mq_vwgBxTB2I6Ig"
-load_dotenv(ROOT / ".env")
+load_dotenv(ENV_FILE)
 
 # Each clone keeps its own provider settings in .env.  Legacy OPENAI_* names
 # remain supported for existing installations.

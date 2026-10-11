@@ -19,7 +19,7 @@ import requests
 
 
 BIZ = "Mzk0NDMzMDM4OQ=="
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "data"
 UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "

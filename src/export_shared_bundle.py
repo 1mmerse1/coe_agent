@@ -7,8 +7,8 @@ doesn't copy API keys, generated previews, activity uploads, or generated
 documents.
 
 Examples (PowerShell)::
-    python export_shared_bundle.py --output .\\shared_bundle
-    python export_shared_bundle.py --output D:\\coe_shared --folder 学校学院 --folder 过渡图标
+    python src/export_shared_bundle.py --output .\\shared_bundle
+    python src/export_shared_bundle.py --output D:\\coe_shared --folder 学校学院 --folder 过渡图标
 """
 
 from __future__ import annotations
@@ -21,8 +21,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-DATA = ROOT / "data"
+from paths import DATA_DIR, ROOT_DIR
+
+
+ROOT = ROOT_DIR
+DATA = DATA_DIR
 DEFAULT_FOLDERS = ("学校学院", "过渡图标")
 ARCHIVE_FILES = ("articles.sqlite3",)
 ARCHIVE_DIRS = ("media", "articles")

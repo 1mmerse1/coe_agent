@@ -9,11 +9,11 @@ import os
 import sqlite3
 import uuid
 from datetime import datetime, timezone
-from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
+from paths import DATA_DIR
+
+
 PROJECT_DB = DATA_DIR / "activity_projects.sqlite3"
 FILES_DIR = DATA_DIR / "activity_files"
 

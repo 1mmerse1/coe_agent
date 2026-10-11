@@ -13,9 +13,9 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 from importer import DB_PATH
+from paths import DATA_DIR
 
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
 PREVIEW_DIR = DATA_DIR / "library_previews"
 RASTER_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 SOURCE_EXTENSIONS = RASTER_EXTENSIONS | {".psd", ".ai"}

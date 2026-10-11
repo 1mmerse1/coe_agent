@@ -2,6 +2,37 @@
 
 这是一个本地运行的活动策划和公众号推送助手。它会读取本地历史推送数据库和图片素材，由 Brainstorm、策划、推送、海报、问卷、PPT 等 Agent 协作生成结果，并保留人工修改环节。
 
+## 目录结构
+
+```text
+coe_agent/
+├─ README.md                    # 项目说明（本文件）
+├─ requirements.txt             # Python 依赖
+├─ .env.example                 # 模型 API Key 配置模板
+├─ 启动推送助手.bat              # 双击启动本地服务
+├─ 开始导入.bat                  # 双击导入公众号文章
+├─ 配置API密钥.bat               # 双击编辑 .env
+├─ 推送URL_test.txt              # 导入用的链接清单
+├─ src/                         # 应用代码
+│  ├─ paths.py                  # 统一目录解析（根目录、data、resources…）
+│  ├─ app.py                    # FastAPI 服务和 Agent 接口
+│  ├─ launch_chat.py            # 启动入口
+│  ├─ importer.py               # 公众号文章入库
+│  ├─ activity_store.py         # 活动草稿与附件存储
+│  ├─ planning_templates.py     # 策划案模板选择
+│  ├─ planning_documents.py     # 策划案 Word/PDF 导出
+│  ├─ local_media_library.py    # 本地图片素材检索
+│  ├─ workflow_framework.py     # Agent 分工与路由契约
+│  ├─ export_shared_bundle.py   # 导出共享数据包
+│  └─ web/index.html            # 前端页面
+├─ scripts/                     # 独立采集脚本（微信客户端 / 网页）
+├─ references/                  # 规则、规划和使用说明
+├─ resources/                   # 策划案模板与编写要求
+└─ data/                        # 运行数据，不进 Git
+```
+
+`data/` 是程序运行目录：历史文章数据库、图片、活动草稿和导出结果都放在这里，已被 `.gitignore` 忽略，不会误提交到 GitHub。
+
 ## 你需要准备的三样东西
 
 合作者第一次使用时，需要分别拿到：
@@ -42,11 +73,14 @@ cd coe_agent
 
 ```text
 coe_agent/
-├─ app.py
-├─ web/
+├─ src/
+├─ scripts/
+├─ references/
+├─ resources/
 ├─ .env.example
 └─ data/
    ├─ articles.sqlite3
+   ├─ articles/
    ├─ media/
    ├─ 学校学院/
    └─ 过渡图标/
@@ -105,9 +139,13 @@ Windows 可以双击：
 也可以在 PowerShell 中运行：
 
 ```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
-python launch_chat.py
+python src\launch_chat.py
 ```
+
+建议为这个项目单独建虚拟环境（上面的 `.venv`），不要和电脑上其他 Python 环境混用。`启动推送助手.bat` 会优先使用项目里的 `.venv`。
 
 浏览器打开：<http://127.0.0.1:8000>
 
@@ -134,7 +172,7 @@ python launch_chat.py
 如果需要从当前电脑重新导出一份共享数据包，在项目根目录运行：
 
 ```powershell
-python export_shared_bundle.py --output D:\coe_shared
+python src\export_shared_bundle.py --output D:\coe_shared
 ```
 
 默认导出：
@@ -149,7 +187,7 @@ python export_shared_bundle.py --output D:\coe_shared
 需要增加其他素材文件夹时：
 
 ```powershell
-python export_shared_bundle.py --output D:\coe_shared `
+python src\export_shared_bundle.py --output D:\coe_shared `
   --folder 学校学院 --folder 过渡图标 --folder 迎新专用
 ```
 
@@ -176,6 +214,6 @@ SQLite 适合每个人各自使用一份只读历史数据库。多人同时修�
 
 更多内容见：
 
-- [数据库共享方案.md](数据库共享方案.md)
-- [本地调试说明.md](本地调试说明.md)
-- [工作流Agent分工方案.md](工作流Agent分工方案.md)
+- [数据库共享方案.md](references/数据库共享方案.md)
+- [本地调试说明.md](references/本地调试说明.md)
+- [工作流Agent分工方案.md](references/工作流Agent分工方案.md)

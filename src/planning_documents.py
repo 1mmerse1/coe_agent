@@ -20,8 +20,10 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
-ROOT = Path(__file__).resolve().parent
-EXPORT_DIR = ROOT / "data" / "activity_exports"
+from paths import DATA_DIR
+
+
+EXPORT_DIR = DATA_DIR / "activity_exports"
 FONT_NAME = "COEChinese"
 
 

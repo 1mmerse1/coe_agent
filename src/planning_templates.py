@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from paths import TEMPLATE_DIR
 
 
-TEMPLATE_DIR = Path(__file__).resolve().parent / "resources" / "planning_templates"
 TEMPLATES = {
     "detailed": {
         "label": "详细版 · 新生手册类项目",

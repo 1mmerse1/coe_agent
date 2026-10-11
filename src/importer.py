@@ -23,8 +23,10 @@ import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
 
 
-ROOT = Path(__file__).resolve().parent
-DATA_DIR = ROOT / "data"
+from paths import DATA_DIR, ROOT_DIR
+
+
+ROOT = ROOT_DIR
 MEDIA_DIR = DATA_DIR / "media"
 SNAPSHOT_DIR = DATA_DIR / "snapshots"
 DB_PATH = DATA_DIR / "articles.sqlite3"
