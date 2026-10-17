@@ -21,7 +21,8 @@ RASTER_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
 SOURCE_EXTENSIONS = RASTER_EXTENSIONS | {".psd", ".ai"}
 EXCLUDED_FOLDERS = {
     "activity_exports", "activity_files", "articles", "graphic_previews",
-    "library_previews", "media", "snapshots",
+    "library_previews", "media", "snapshots", "generated_images", "hero_references",
+    "presentation_exports",
 }
 _CACHE_LOCK = threading.Lock()
 _CATALOG_CACHE: list[dict] = []
@@ -62,7 +63,7 @@ def _curated_records() -> list[dict]:
     if not DATA_DIR.is_dir():
         return records
     for folder in DATA_DIR.iterdir():
-        if not folder.is_dir() or folder.name in EXCLUDED_FOLDERS:
+        if not folder.is_dir() or folder.name.startswith(".") or folder.name in EXCLUDED_FOLDERS:
             continue
         for path in folder.rglob("*"):
             if not path.is_file() or path.suffix.lower() not in SOURCE_EXTENSIONS:
@@ -136,10 +137,12 @@ def media_role(record: dict) -> str:
     if not record.get("reusable"):
         return "archive_reference"
     top = str(record.get("relative_path", "")).split("/", 1)[0]
-    if top == "学校学院":
+    if top == "学校学院" and record["path"].stem in {"首图", "尾图"}:
         return "school_brand"
     if top == "过渡图标":
         return "transition_icon"
+    if "工小成" in record["label"]:
+        return "mascot"
     return "general"
 
 

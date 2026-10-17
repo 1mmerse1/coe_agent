@@ -173,10 +173,55 @@
     .library-card label { display:flex; align-items:flex-start; gap:5px; margin-top:5px; cursor:pointer; }
     .library-card label span { font-size:11px; overflow-wrap:anywhere; line-height:1.4; max-height:47px; overflow:hidden; }
     .library-card small,.library-card a { display:block; color:#728096; font-size:10px; text-decoration:none; }
+    .template-gallery { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:7px; margin-top:8px; }
+    .template-card { border:1px solid #dfe5ef; border-radius:8px; background:#fff; padding:7px; cursor:pointer; min-width:0; }
+    .template-card.selected { border-color:#718ce7; background:#f4f7ff; box-shadow:0 0 0 1px #b9c8fb inset; }
+    .template-swatch { height:38px; border-radius:5px; padding:5px; font-size:10px; font-weight:700; overflow:hidden; display:flex; align-items:center; }
+    .template-card strong { display:block; margin-top:4px; font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .template-card small { display:block; color:#728096; font-size:9px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .library-status { color:#6b778a; font-size:11px; margin-top:7px; }
     .attachment-usage { flex:1; min-width:130px; border:1px solid #dbe2ee; border-radius:5px; padding:3px 5px; font-size:11px; }
     .attachment-placement { border:1px solid #dbe2ee; border-radius:5px; padding:3px 4px; font-size:11px; background:#fff; }
+    .push-form-section { border:1px solid #dfe5ef; border-radius:12px; padding:16px; margin:14px 0; background:#fff; }
+    .push-form-section h3 { font-size:15px; margin:0 0 6px; color:#243651; }
+    .push-form-section .field:last-child { margin-bottom:0; }
+    .push-kind { display:flex; gap:10px; margin:12px 0; flex-wrap:wrap; }
+    .push-kind label { padding:10px 14px; border:1px solid #dfe5ef; border-radius:9px; font-size:13px; }
+    .push-kind label:has(input:checked) { background:#f1f5ff; border-color:#8fa7ed; }
+    .push-kind label:has(input:disabled) { color:#98a2b3; background:#fafbfc; }
+    .push-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; }
+    .push-actions button,.row-actions button { border:1px solid #d4ddec; background:#fff; color:#435b85; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; }
+    .push-actions button:disabled,.row-actions button:disabled { opacity:.5; cursor:default; }
+    .brief-row { border:1px solid #e2e7ef; border-radius:9px; padding:12px; margin:8px 0; background:#fafcff; }
+    .row-actions { display:flex; justify-content:flex-end; gap:5px; margin-bottom:7px; }
+    .brief-empty { color:#7a8799; font-size:12px; margin:9px 0; }
+    #contentAttachments { display:grid; grid-template-columns:1fr; }
+    #contentAttachments .attachment-chip { border-radius:9px; padding:10px; flex-wrap:wrap; }
+    .attachment-thumb { width:62px; height:62px; object-fit:contain; background:#f3f5f9; border-radius:6px; }
+    .push-copy { padding:14px 0; }
+    .push-copy h3 { font-size:18px; margin:0 0 12px; }
+    .push-copy h4 { font-size:14px; margin:18px 0 6px; }
+    .push-copy p { white-space:pre-wrap; color:#344054; line-height:1.9; margin:7px 0; font-size:14px; }
+    .push-preview { width:100%; height:650px; border:1px solid #e2e7ef; border-radius:9px; margin-top:10px; background:#fff; }
+    .push-revision { margin-top:14px; border-top:1px solid #e5eaf1; padding-top:12px; }
+    .push-revision textarea { width:100%; min-height:70px; border:1px solid #ccd6e6; border-radius:8px; padding:9px; font:13px/1.6 inherit; resize:vertical; box-sizing:border-box; }
+    .push-revision button { margin-top:7px; border:1px solid #8ca5ed; border-radius:8px; background:#f2f5ff; color:#304c9c; padding:7px 12px; cursor:pointer; }
+    .push-revision-log { display:grid; gap:5px; margin:8px 0; font-size:12px; }
+    .push-revision-log div { padding:6px 8px; border-radius:7px; white-space:pre-wrap; }
+    .push-revision-log .user { background:#f2f5ff; color:#304c75; }
+    .push-revision-log .assistant { background:#f7f8fa; color:#667085; }
+    .push-editor { margin-top:14px; border-top:1px solid #e5eaf1; padding-top:12px; }
+    .push-editor-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; }
+    .push-editor textarea { width:100%; min-height:360px; box-sizing:border-box; border:1px solid #ccd6e6; border-radius:8px; padding:10px; resize:vertical; font:13px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .markdown-preview { min-height:360px; max-height:540px; overflow:auto; padding:12px 14px; border:1px solid #e2e7ef; border-radius:8px; background:#fff; color:#344054; line-height:1.85; }
+    .markdown-preview h1 { font-size:21px; margin:0 0 12px; color:#1d2939; }
+    .markdown-preview h2 { font-size:17px; margin:20px 0 7px; color:#304c9c; }
+    .markdown-preview h3 { font-size:15px; margin:14px 0 4px; color:#344054; }
+    .markdown-preview p { margin:7px 0; white-space:pre-wrap; }
+    .push-editor-actions { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; }
+    .push-editor-status { color:#667085; font-size:12px; }
     @media(max-width:740px) { .shell{grid-template-columns:1fr} aside{display:none} header{padding:0 18px} .scroll{padding:16px 15px}.welcome{padding-top:7vh}.composer-wrap{padding:13px 12px 16px}.push-grid,.editor-grid,.fact-card .editor-grid{grid-template-columns:1fr}.mode-tabs{display:none}.content-options,.library-grid{grid-template-columns:1fr 1fr}.activity-step{font-size:11px;padding:8px 4px} }
+    @media(max-width:740px) { .push-editor-grid{grid-template-columns:1fr;} .markdown-preview{min-height:220px;} }
   </style>
 </head>
 <body>
@@ -207,7 +252,7 @@
       </div>
       <div class="side-bottom">
         <div class="db-stat">本地文章库　<strong id="articleCount">读取中…</strong></div>
-        <div class="model-pill" id="modelPill">gpt-6-sol · high</div>
+        <div class="model-pill" id="modelPill">gpt-6.1-sol · high</div>
       </div>
     </aside>
     <main>
@@ -292,19 +337,69 @@
               <label class="content-option"><input type="checkbox" value="ppt"><strong>PPT</strong><small>生成汇报结构和页级内容</small></label>
             </div>
             <div class="push-grid">
-              <div class="field"><label for="contentTheme">活动名称 / 推送主题</label><input id="contentTheme" placeholder="例如：新生交流活动"></div>
-              <div class="field"><label for="contentAudience">面向对象（可选）</label><input id="contentAudience" placeholder="例如：2026级新生"></div>
+              <div class="field"><label for="contentTheme">活动名称 / 推送主题</label><input id="contentTheme" maxlength="500" placeholder="例如：新生交流活动"></div>
+              <div class="field"><label for="contentAudience">面向对象（可选）</label><input id="contentAudience" maxlength="500" placeholder="例如：2026级新生"></div>
             </div>
-            <div class="field"><label for="contentRequirements">内容补充与风格要求（可选）</label><textarea id="contentRequirements" placeholder="例如：推送语气亲切，海报突出报名截止时间，PPT 控制在 8 页以内"></textarea></div>
-            <div class="field"><label for="contentReviewer">审核人（可选）</label><input id="contentReviewer" placeholder="例如：尹老师"></div>
+            <div id="pushBriefPanel">
+              <div class="push-kind" role="group" aria-label="推送类型">
+                <label><input type="radio" name="pushKind" value="预热" checked> 预热推送 · 活动前邀请</label>
+                <label><input type="radio" name="pushKind" value="总结" disabled> 总结推送 · 稍后开放</label>
+              </div>
+              <div class="push-actions"><button type="button" id="preparePushBrief">根据前两步补全空白</button><small class="field-help" id="pushBriefStatus">先整理成面向同学们的介绍，再检查和修改下方信息。</small></div>
+              <details id="pushBriefReview" hidden><summary>未带入表单的待核实信息</summary><ul id="pushBriefReviewList"></ul></details>
+              <section class="push-form-section">
+                <h3>1. 活动信息与简介</h3>
+                <p class="stage-help">只填已确认的信息；不确定的字段可以留空，成稿会自动省略。</p>
+                <div class="push-grid">
+                  <div class="field"><label for="pushEventTime">活动时间</label><input id="pushEventTime" maxlength="300" placeholder="例如：2026年10月24日 14:00—16:00"></div>
+                  <div class="field"><label for="pushLocation">活动地点</label><input id="pushLocation" maxlength="500" placeholder="例如：新奥工学大楼 1006 会议室"></div>
+                </div>
+                <details><summary>具体时间安排（可选）</summary><div class="field"><label for="pushSchedule">每行一个时间段与环节</label><textarea id="pushSchedule" maxlength="4000" placeholder="14:00—14:15　开场与嘉宾分享&#10;14:15—15:30　圆桌交流"></textarea></div></details>
+                <div class="field"><div class="library-head"><label for="pushIntroduction">主题简介 · 面向同学们的介绍</label><button type="button" id="rewritePushIntro">根据前两步重写简介</button></div><textarea id="pushIntroduction" data-attachment-stage="content" maxlength="5000" placeholder="Agent 根据前两步先写几句话，你可以直接补充或改写；也可从这里开始自己填写。"></textarea><small class="field-help">这段文字将作为推送导语保留。重写只替换简介，其他字段保持你的修改。</small></div>
+                <div class="field"><label for="pushParticipation">报名 / 参与方式（可选）</label><textarea id="pushParticipation" data-attachment-stage="content" maxlength="3000" placeholder="已确认的报名方式、链接、截止时间等。二维码图片可在下方上传并注明放在文末。"></textarea></div>
+              </section>
+              <section class="push-form-section">
+                <div class="library-head"><h3>2. 嘉宾与介绍（可选）</h3><button type="button" id="addPushGuest">＋ 添加嘉宾</button></div>
+                <p class="stage-help">每位嘉宾分别填写姓名、身份和介绍，嘉宾照片在下方上传并注明姓名。</p><div id="pushGuests"></div>
+              </section>
+              <section class="push-form-section">
+                <div class="library-head"><h3>3. 正文模块规划</h3><button type="button" id="addPushModule">＋ 添加板块</button></div>
+                <p class="stage-help">可填写每部分标题与写作要点，调整顺序；全部留空则由 Agent 灵活规划。时间安排、活动信息和报名方式会单独排版。</p><div id="pushModules"></div>
+              </section>
+            </div>
+            <section class="push-form-section">
+              <h3>图片与补充资料</h3>
+              <div class="field"><label for="contentRequirements">补充信息 / 风格要求（可选）</label><textarea id="contentRequirements" data-attachment-stage="content" maxlength="8000" placeholder="例如：语气亲切，开场用普通正文，嘉宾介绍单列板块。可直接拖入图片、参考推文、PDF、Word 等资料。"></textarea>
+              <div class="dropzone" data-dropzone="content" role="button" tabindex="0" aria-label="上传补充资料和推送参考附件">上传图片或附件，也可拖到这里<input id="contentFiles" type="file" multiple></div>
+              <small class="field-help">支持图片、PDF、Word、表格等，每个文件不超过 12MB，最多 12 个。图片可选“加入推送”或“仅作参考”，并填写用途和位置；文档作为补充资料或风格参考。</small>
+              <div class="attachment-list" id="contentAttachments"></div>
+              </div>
+            </section>
+            <div class="field"><label for="contentReviewer">审核人（可选）</label><input id="contentReviewer" maxlength="100" placeholder="例如：尹老师"></div>
+            <details><summary>学院通用图片素材 · 首尾图自动加入</summary>
             <div class="library-panel">
               <div class="library-head"><strong>本地图片素材库</strong><button type="button" id="refreshLibrary">按当前主题重新推荐</button></div>
-              <p class="library-note">自动查找 data/ 中的学院素材。学校学院文件夹的首图和尾图会固定放在推送开头和结尾；过渡图标可放在正文。往期推送图片暂不作为本次配图。</p>
+              <p class="library-note">自动查找 data/ 中的学院素材。学校学院文件夹的首图和尾图固定在开头和结尾；过渡图标、工小成可按板块使用。往期现场图在下方推荐，标明来源供人工选择。</p>
               <div class="library-grid" id="libraryGrid"></div>
               <div class="library-status" id="libraryStatus">进入本步骤后自动推荐。</div>
             </div>
-            <div class="field"><label for="contentTemplate">历史推送排版模板（可选）</label><select id="contentTemplate"><option value="">由 Agent 按主题选择</option></select><small class="field-help">模板只提取颜色、间距和图片/章节结构，不带入往期活动事实。</small></div>
-            <div class="field"><label>内容素材和参考文件（可拖入）</label><div class="dropzone" data-dropzone="content">拖入图片、文档、表格或其他素材，或点击选择<input id="contentFiles" type="file" multiple></div><div class="attachment-list" id="contentAttachments"></div></div>
+            </details>
+            <section class="push-form-section"><h3>模板与排版</h3><div class="field"><label for="pushTemplateMode">模板选择方式</label><select id="pushTemplateMode"><option value="auto">自动 · Agent 按内容搭配</option><option value="manual">手动 · 选择优先参考模板</option></select></div><div id="manualTemplatePanel" hidden><div class="field"><div class="library-head"><label for="contentTemplate">选择参考模板</label><button type="button" id="refreshTemplates">重新提取模板</button></div><select id="contentTemplate"><option value="">请选择优先参考模板</option></select><div id="templateGallery" class="template-gallery"></div></div></div><small id="templateStatus" class="field-help">进入本步骤后读取本地历史排版。</small><small class="field-help">模板可按板块组合，普通正文也可独立使用。手动选择表示优先参考，全篇不强制套同一种模板。</small></section>
+            <div class="library-panel">
+              <div class="library-head"><strong>往期图片推荐与行文参考</strong><button type="button" id="refreshPushReferences">按当前活动推荐</button></div>
+              <p class="library-note">参考相似推文的开场、短段落和板块顺序。往期图是待查看的候选，可能包含海报、嘉宾照；不自动当作本次现场图。</p>
+              <div id="pushReferenceStatus" class="library-status">进入本步骤后自动读取。</div>
+              <div id="pushWritingReferences"></div><div id="pushImageSuggestions" class="library-grid"></div>
+            </div>
+            <details><summary>创作活动主题图（可选）</summary><div class="library-panel">
+              <div class="library-head"><strong>活动主题图</strong></div>
+              <div class="field"><label for="heroMode">推送生成时</label><select id="heroMode"><option value="off">仅生成图文</option><option value="generate">同时创作一张主题图，放在首图之后</option></select></div>
+              <div class="field"><label for="heroTitle">图中文字（可选）</label><input id="heroTitle" maxlength="60" placeholder="例如：邻域圆桌谈；留空则不在图中写字"></div>
+              <div class="field"><label for="heroStyle">主题图风格和画面要求</label><textarea id="heroStyle" rows="2" maxlength="2000" placeholder="例如：蓝色纸张拼贴、新奥大楼为背景，工小成围桌交流"></textarea></div>
+              <p class="library-note">自动读取本机吉祥物、校园建筑作为参考，调用图片模型创作，单独计费。已有推送可只补主题图，无需重新生成文案；失败时保留原推送。</p>
+              <button type="button" id="heroOnlyButton" class="secondary-button">为已有推送生成主题图</button>
+              <small id="heroStatus" class="field-help">需要图片 API 支持参考图片生成；可在 .env 单独配置。</small>
+            </div></details>
             <button class="generate-button" id="contentButton" type="button">生成所选内容</button>
             <div class="stage-error" id="contentError" hidden></div>
             <div class="stage-result" id="contentResult" hidden>
@@ -444,7 +539,115 @@
     let libraryTemplates = [];
     let libraryInitialized = false;
     let libraryQuery = '';
-    const workspaceFields = ['brainstormInput','brainstormExtra','brainstormOutput','planningBrainstorm','planningAdditions','planningStyle','planningTemplate','planningOutput','contentTheme','contentAudience','contentRequirements','contentReviewer','contentTemplate'];
+    let pushGuests = [];
+    let pushModules = [];
+    let pushBriefInitialized = false;
+    let pushBriefNotes = [];
+    let pushPrepareToken = 0;
+    let pushRevisionBusy = false;
+
+    function inferGuestIndex(usage) {
+      const match = String(usage || '').match(/第?\s*(\d{1,2}|十二|十一|十|[一二三四五六七八九两])\s*(?:位|个)?嘉宾/);
+      if (!match) return null;
+      const n = Number(match[1]) || ({一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9,十:10,十一:11,十二:12})[match[1]];
+      return n >= 1 && n <= 12 ? n - 1 : null;
+    }
+
+    function clearGuestBinding(file) {
+      file.guest_index = null;
+      file.usage = (file.usage || '').replace(/第?\s*(\d{1,2}|十二|十一|十|[一二三四五六七八九两])\s*(?:位|个)?嘉宾/g, '').trim();
+    }
+    const workspaceFields = ['brainstormInput','brainstormExtra','brainstormOutput','planningBrainstorm','planningAdditions','planningStyle','planningTemplate','planningOutput','contentTheme','contentAudience','contentRequirements','contentReviewer','contentTemplate','heroMode','heroTitle','heroStyle','pushEventTime','pushLocation','pushSchedule','pushIntroduction','pushParticipation','pushTemplateMode'];
+
+    function pushBriefPayload() {
+      const read = id => document.getElementById(id).value.trim();
+      return {event_time:read('pushEventTime'), location:read('pushLocation'), schedule:read('pushSchedule'), introduction:read('pushIntroduction'), participation:read('pushParticipation'),
+        guests:pushGuests.filter(g => g.name || g.identity || g.introduction), modules:pushModules.filter(m => m.heading || m.notes)};
+    }
+
+    function selectedPushTemplate() { return document.getElementById('pushTemplateMode').value === 'manual' ? document.getElementById('contentTemplate').value : ''; }
+
+    function renderPushBrief() {
+      for (const [kind, items, targetId, fields, limit] of [
+        ['guest',pushGuests,'pushGuests',[['name','姓名','例如：张同学',100],['identity','身份 / 研究方向','例如：工学院博士生',500],['introduction','嘉宾介绍','经历、分享主题或想对同学们说的话',3000]],12],
+        ['module',pushModules,'pushModules',[['heading','板块标题','例如：这次，我们聊什么',100],['notes','写作要点 / 这一部分放什么','已确认内容、希望强调的问题，也可写排版要求',2000]],16],
+      ]) {
+        const target = document.getElementById(targetId); target.replaceChildren();
+        if (!items.length) { const empty = document.createElement('p'); empty.className = 'brief-empty'; empty.textContent = kind === 'guest' ? '暂无嘉宾；没有嘉宾的活动可直接跳过。' : '暂无指定板块，生成时由 Agent 根据内容规划。'; target.append(empty); }
+        items.forEach((item, index) => {
+          const card = document.createElement('div'); card.className = 'brief-row';
+          const actions = document.createElement('div'); actions.className = 'row-actions';
+          for (const [label, delta] of [['上移',-1],['下移',1],['删除',0]]) {
+            const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+            button.setAttribute('aria-label', `${kind === 'guest' ? '嘉宾' : '板块'}${index + 1}${label}`);
+            button.disabled = delta < 0 && index === 0 || delta > 0 && index === items.length - 1;
+            button.addEventListener('click', () => { if (!delta) items.splice(index,1); else [items[index],items[index+delta]] = [items[index+delta],items[index]]; renderPushBrief(); renderAttachments('content'); scheduleProjectSave(); }); actions.append(button);
+          }
+          card.append(actions);
+          const grid = document.createElement('div'); grid.className = 'editor-grid';
+          for (const [key,label,placeholder,max] of fields) {
+            const field = document.createElement('div'); field.className = `editor-field${key === 'introduction' || key === 'notes' ? ' wide' : ''}`;
+            const id = `push-${kind}-${index}-${key}`; const caption = document.createElement('label'); caption.htmlFor = id; caption.textContent = label;
+            const input = document.createElement(key === 'introduction' || key === 'notes' ? 'textarea' : 'input'); input.id = id; input.value = item[key] || ''; input.placeholder = placeholder; input.maxLength = max;
+            input.addEventListener('input', () => { item[key] = input.value; pushBriefInitialized = true; scheduleProjectSave(); });
+            if (key === 'heading' || key === 'name') input.addEventListener('change', () => renderAttachments('content'));
+            field.append(caption,input); grid.append(field);
+          }
+          card.append(grid); target.append(card);
+        });
+        document.getElementById(kind === 'guest' ? 'addPushGuest' : 'addPushModule').disabled = items.length >= limit;
+      }
+      const panel = document.getElementById('pushBriefReview'); panel.hidden = !pushBriefNotes.length;
+      const list = document.getElementById('pushBriefReviewList'); list.replaceChildren();
+      for (const note of pushBriefNotes) { const li = document.createElement('li'); li.textContent = note; list.append(li); }
+      updatePushControls();
+    }
+
+    function updatePushControls() {
+      const selected = document.querySelector('#contentOptions input[value="push"]').checked;
+      document.getElementById('pushBriefPanel').hidden = !selected;
+      document.getElementById('manualTemplatePanel').hidden = document.getElementById('pushTemplateMode').value !== 'manual';
+      const types = [...document.querySelectorAll('#contentOptions input:checked')];
+      document.getElementById('contentButton').textContent = types.length === 1 && selected ? '生成预热推送' : '生成所选内容';
+    }
+
+    async function preparePushInputs(introOnly = false) {
+      const planning = document.getElementById('planningOutput').value.trim();
+      const brainstorm = document.getElementById('brainstormOutput').value.trim() || document.getElementById('planningBrainstorm').value.trim();
+      const status = document.getElementById('pushBriefStatus');
+      if (planning.length < 10 && brainstorm.length < 10) { status.textContent = '可先填写前两步资料，也可以直接填写下方表单。'; return; }
+      if (document.getElementById('preparePushBrief').disabled) return;
+      const token = ++pushPrepareToken;
+      const targetProject = await ensureProject();
+      if (token !== pushPrepareToken || activeProjectId !== targetProject) return;
+      const fields = {theme:'contentTheme',audience:'contentAudience',event_time:'pushEventTime',location:'pushLocation',schedule:'pushSchedule',introduction:'pushIntroduction',participation:'pushParticipation'};
+      const before = Object.fromEntries(Object.entries(fields).map(([key,id]) => [key,document.getElementById(id).value]));
+      const previousGuests = JSON.stringify(pushGuests), previousModules = JSON.stringify(pushModules);
+      for (const id of ['preparePushBrief','rewritePushIntro']) document.getElementById(id).disabled = true;
+      status.textContent = introOnly ? '正在根据前两步重写简介…' : '正在整理已确认资料、起草简介与板块建议…';
+      try {
+        const response = await apiFetch('/api/activity/push/prepare', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({planning,brainstorm,theme:before.theme,audience:before.audience,requirements:document.getElementById('contentRequirements').value.trim()})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '推送资料整理失败');
+        if (token !== pushPrepareToken || targetProject !== activeProjectId) return;
+        if (document.getElementById('planningOutput').value.trim() !== planning) { status.textContent = '策划案已修改，本次建议未带入；可再次补全空白。'; return; }
+        const values = {...data.brief,theme:data.theme,audience:data.audience};
+        for (const [key,id] of Object.entries(fields)) {
+          if (introOnly && key !== 'introduction') continue;
+          const input = document.getElementById(id);
+          if (input.value === before[key] && (introOnly || !before[key].trim()) && values[key]) input.value = values[key];
+        }
+        if (!introOnly && !pushGuests.length && previousGuests === JSON.stringify(pushGuests)) pushGuests = data.brief.guests || [];
+        if (!introOnly && !pushModules.length && previousModules === JSON.stringify(pushModules)) pushModules = data.brief.modules || [];
+        pushBriefInitialized = true; pushBriefNotes = data.review_notes || []; renderPushBrief(); renderAttachments('content');
+        status.textContent = introOnly ? '简介已更新；若生成期间你修改了简介，会保留你的修改。' : '已补全空白。请检查简介、嘉宾及板块，未确认信息已留空。';
+        await saveProjectNow();
+      } catch (error) { if (token === pushPrepareToken) status.textContent = `${error.message}；可以直接填写表单后生成。`; }
+      finally { if (token === pushPrepareToken) for (const id of ['preparePushBrief','rewritePushIntro']) document.getElementById(id).disabled = false; }
+    }
+
+    function maybePreparePushInputs() {
+      if (!pushBriefInitialized && document.querySelector('#contentOptions input[value="push"]').checked && !document.getElementById('pushIntroduction').value.trim()) preparePushInputs().catch(error => { document.getElementById('pushBriefStatus').textContent = error.message; });
+    }
 
     function projectTitle() {
       const direct = document.getElementById('contentTheme').value.trim();
@@ -459,11 +662,11 @@
       const fields = Object.fromEntries(workspaceFields.map(id => [id, document.getElementById(id).value]));
       const meta = Object.fromEntries(['brainstormMeta','planningMeta','contentMeta'].map(id => [id, document.getElementById(id).textContent]));
       const attachments = Object.fromEntries(Object.entries(activityAttachments).map(([stage, files]) => [stage, files.map(file => {
-        const item = {name:file.name,mime_type:file.mime_type,size:file.size,text:file.text || '',storage_id:file.storage_id || ''};
+        const item = {name:file.name,mime_type:file.mime_type,size:file.size,text:file.text || '',storage_id:file.storage_id || '',usage:file.usage || '',placement:file.placement || 'auto',usage_mode:file.usage_mode || 'content',section_heading:file.section_heading || '',guest_index:Number.isInteger(file.guest_index) ? file.guest_index : null};
         if (!item.storage_id && file.data_url) item.data_url = file.data_url;
         return item;
       })]));
-      return {title:projectTitle(),stage:activeStage,fields,meta,attachments,content_types:[...document.querySelectorAll('#contentOptions input:checked')].map(x => x.value),content_result:contentDraft,planning_documents:planningDocuments,advisor_history:advisorHistory.slice(-20),library_candidates:libraryCandidates,library_selected_ids:librarySelectedIds,library_initialized:libraryInitialized,library_query:libraryQuery};
+      return {title:projectTitle(),stage:activeStage,fields,meta,attachments,push_guests:pushGuests,push_modules:pushModules,push_brief_initialized:pushBriefInitialized,push_brief_notes:pushBriefNotes,content_types:[...document.querySelectorAll('#contentOptions input:checked')].map(x => x.value),content_result:contentDraft,planning_documents:planningDocuments,advisor_history:advisorHistory.slice(-20),library_candidates:libraryCandidates,library_selected_ids:librarySelectedIds,library_initialized:libraryInitialized,library_query:libraryQuery};
     }
 
     async function ensureProject() {
@@ -538,7 +741,7 @@
           libraryInitialized = true; document.getElementById('libraryStatus').textContent = `已选择 ${librarySelectedIds.length} 张；可继续拖入本次活动照片。`; scheduleProjectSave();
         });
         const name = document.createElement('span'); name.textContent = item.label; label.append(checkbox, name); card.append(label);
-        const type = document.createElement('small'); type.textContent = item.media_role === 'school_brand' ? '学校学院 · 首尾固定' : item.media_role === 'transition_icon' ? '过渡图标 · 正文可用' : '学院素材 · 可复用'; card.append(type);
+        const type = document.createElement('small'); type.textContent = item.media_role === 'school_brand' ? '学校学院 · 首尾固定' : item.media_role === 'transition_icon' ? '过渡图标 · 正文可用' : item.media_role === 'mascot' ? '工小成 · 板块配图' : '学院素材 · 可复用'; card.append(type);
         if (item.source_url) { const source = document.createElement('a'); source.href = item.source_url; source.target = '_blank'; source.rel = 'noopener noreferrer'; source.textContent = '查看原推送'; card.append(source); }
         grid.append(card);
       }
@@ -554,26 +757,107 @@
       libraryCandidates = data.items || [];
       librarySelectedIds = resetSelection || !libraryInitialized ? (data.suggested_ids || []).slice(0, 4) : librarySelectedIds.filter(id => libraryCandidates.some(item => item.id === id));
       libraryQuery = query; libraryInitialized = true; renderLibrary(); scheduleProjectSave();
+      loadPushReferences().catch(error => { document.getElementById('pushReferenceStatus').textContent = error.message; });
     }
 
-    async function loadLibraryTemplates() {
-      const select = document.getElementById('contentTemplate'); if (!select || libraryTemplates.length) return;
-      const response = await apiFetch(`/api/library/templates?q=${encodeURIComponent(currentLibraryQuery())}&limit=12`);
+    function renderImageSuggestions(target, suggestions, allowSelect = false) {
+      target.replaceChildren();
+      for (const item of suggestions || []) {
+        const card = document.createElement('div'); card.className = 'library-card';
+        const imageLink = document.createElement('a'); imageLink.href = item.preview_url; imageLink.target = '_blank'; imageLink.rel = 'noopener';
+        const image = document.createElement('img'); image.src = item.preview_url; image.alt = item.label; image.loading = 'lazy'; imageLink.append(image); card.append(imageLink);
+        const title = document.createElement('strong'); title.style.fontSize = '11px'; title.textContent = item.kind === 'historical_photo_candidate' ? '往期图片候选 · 待确认' : item.kind === 'transition_icon' ? '过渡图标' : item.kind === 'mascot' ? '工小成' : '学院素材'; card.append(title);
+        const position = document.createElement('small'); position.textContent = item.section_heading ? `“${item.section_heading}”${item.position === 'before' ? '之前' : '之后'}` : item.suggested_position; card.append(position);
+        const reason = document.createElement('small'); reason.textContent = item.reason; card.append(reason);
+        if (item.applied) { const applied = document.createElement('small'); applied.textContent = '已加入本次 HTML'; applied.style.color = '#168467'; card.append(applied); }
+        if (item.source_title) { const source = document.createElement('small'); source.textContent = `${item.source_title}${item.published_at ? ' · ' + item.published_at : ''}`; card.append(source); }
+        if (item.source_url) { const link = document.createElement('a'); link.href = item.source_url; link.target = '_blank'; link.rel = 'noopener'; link.textContent = '查看来源推文'; card.append(link); }
+        if (allowSelect && item.can_embed) {
+          const button = document.createElement('button'); button.type = 'button'; button.textContent = librarySelectedIds.includes(item.id) ? '已列为候选' : '列为配图候选'; button.disabled = librarySelectedIds.includes(item.id);
+          button.addEventListener('click', () => {
+            if (librarySelectedIds.length >= 4) { document.getElementById('pushReferenceStatus').textContent = '最多选择4张，可先取消其他候选。'; return; }
+            if (!libraryCandidates.some(r => r.id === item.id)) libraryCandidates.push(item);
+            librarySelectedIds.push(item.id); button.textContent = '已列为候选'; button.disabled = true; renderLibrary(); scheduleProjectSave();
+          }); card.append(button);
+        }
+        target.append(card);
+      }
+    }
+
+    async function loadPushReferences() {
+      const project = activeProjectId; const query = currentLibraryQuery();
+      document.getElementById('pushReferenceStatus').textContent = '正在整理历史行文与配图候选…';
+      const response = await apiFetch(`/api/library/push-references?q=${encodeURIComponent(query)}`);
+      const data = await response.json(); if (!response.ok) throw new Error(data.detail || '历史参考读取失败');
+      if (project !== activeProjectId || query !== currentLibraryQuery()) return;
+      const target = document.getElementById('pushWritingReferences'); target.replaceChildren();
+      for (const ref of data.writing_style?.references || []) {
+        const details = document.createElement('details'); details.style.fontSize = '12px';
+        const summary = document.createElement('summary'); summary.textContent = `${ref.title} · 段落长度中位数 ${ref.median_paragraph_chars} 字`; details.append(summary);
+        const blocks = document.createElement('p'); blocks.textContent = `历史板块：${ref.heading_examples.join(' → ') || '未识别明确小标题'}。可借鉴角色：${ref.section_roles.join('、') || '开场、主题内容、结尾邀请'}`; details.append(blocks);
+        const tone = document.createElement('p'); tone.textContent = `稿件类型：${ref.article_type || '历史推文'}；常用称呼：${(ref.address_examples || []).join('、') || '无明显直接称呼'}`; details.append(tone);
+        for (const [label, sampleText] of [['开场', ref.opening_sample], ['正文与转折', ref.body_sample], ['收尾', ref.closing_sample]]) {
+          if (!sampleText) continue;
+          const sample = document.createElement('p'); sample.style.whiteSpace = 'pre-wrap'; sample.textContent = `历史${label}样例（其中事实不沿用）：\n${sampleText}`; details.append(sample);
+        }
+        target.append(details);
+      }
+      renderImageSuggestions(document.getElementById('pushImageSuggestions'), data.image_suggestions, true);
+      document.getElementById('pushReferenceStatus').textContent = `${data.writing_style?.references?.length || 0} 篇行文参考 · ${data.image_suggestions?.length || 0} 张配图候选。生成时结合内容给出板块位置建议。`;
+    }
+
+    async function loadLibraryTemplates(refresh = false) {
+      const select = document.getElementById('contentTemplate'); if (!select || (libraryTemplates.length && !refresh)) { renderTemplateGallery(); return; }
+      const desired = select.value;
+      const projectId = activeProjectId;
+      document.getElementById('templateStatus').textContent = '正在提取本地推文排版…';
+      const response = await apiFetch(`/api/library/templates?q=${encodeURIComponent(currentLibraryQuery())}&limit=24${refresh ? '&refresh=true' : ''}`);
       const data = await response.json(); if (!response.ok) throw new Error(data.detail || '历史模板读取失败');
+      if (activeProjectId !== projectId) return;
       libraryTemplates = data.items || [];
-      for (const item of libraryTemplates) { const option = document.createElement('option'); option.value = item.template_id; option.textContent = `${item.label}（${item.image_count}图/${item.section_count}节）`; select.append(option); }
+      select.replaceChildren(new Option('由 Agent 灵活搭配', ''));
+      for (const item of libraryTemplates) select.append(new Option(`${item.label}（${item.source_count} 篇来源）`, item.template_id));
+      const restored = libraryTemplates.find(item => item.template_id === desired || item.sources?.some(source => String(source.id) === desired.replace('historical-', '')));
+      if (desired && !restored) select.append(new Option('已保存的模板（当前库未找到，生成前请重选）', desired));
+      select.value = restored?.template_id || desired;
+      const stats = data.stats || {};
+      document.getElementById('templateStatus').textContent = libraryTemplates.length ? `${stats.article_count} 篇推文 · ${stats.usable_articles} 篇可提取 · ${stats.template_count} 种布局。可选优先参考，Agent 按板块灵活搭配。` : '暂无可提取样式，请先放入历史推文数据库。';
+      renderTemplateGallery();
+    }
+
+    function renderTemplateGallery() {
+      const gallery = document.getElementById('templateGallery'); if (!gallery) return;
+      gallery.replaceChildren();
+      for (const item of libraryTemplates) {
+        const card = document.createElement('div'); card.tabIndex = 0; card.setAttribute('role', 'button'); card.setAttribute('aria-label', `选择${item.label}`); card.className = `template-card${document.getElementById('contentTemplate').value === item.template_id ? ' selected' : ''}`;
+        const heading = item.components?.heading || {}; const section = item.components?.section || {};
+        const swatch = document.createElement('span'); swatch.className = 'template-swatch'; swatch.style.color = heading.color || '#253142'; swatch.style.backgroundColor = heading['background-color'] || section['background-color'] || '#f4f7fb'; swatch.style.borderBottom = heading['border-bottom'] || '2px solid transparent'; swatch.textContent = '活动标题示例';
+        const name = document.createElement('strong'); name.textContent = item.label;
+        const meta = document.createElement('small'); meta.textContent = `${item.source_count} 篇采用 · ${item.layout === 'label' ? '色块标题' : item.layout === 'bordered' ? '边框标题' : item.layout === 'underline' ? '线条标题' : item.layout === 'centered' ? '居中标题' : '简洁标题'}`;
+        const preview = document.createElement('a'); preview.href = item.preview_url; preview.target = '_blank'; preview.rel = 'noopener'; preview.textContent = '查看中性预览'; preview.style.cssText = 'display:block;color:#526bb8;font-size:9px;margin-top:3px;text-decoration:none;'; preview.addEventListener('click', event => event.stopPropagation());
+        card.append(swatch, name, meta, preview); card.addEventListener('click', () => { document.getElementById('contentTemplate').value = item.template_id; renderTemplateGallery(); scheduleProjectSave(); }); gallery.append(card);
+        card.addEventListener('keydown', event => { if (event.target === card && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); card.click(); } });
+      }
     }
 
     function resetActivityForm() {
       restoringProject = true;
       workspaceFields.forEach(id => { document.getElementById(id).value = id === 'planningStyle' ? '清晰、稳妥、可执行' : id === 'planningTemplate' ? 'auto' : ''; });
+      document.getElementById('heroMode').value = 'off';
+      document.getElementById('pushTemplateMode').value = 'auto';
+      pushPrepareToken++; pushGuests = []; pushModules = []; pushBriefInitialized = false; pushBriefNotes = [];
+      for (const id of ['preparePushBrief','rewritePushIntro']) document.getElementById(id).disabled = false;
+      document.getElementById('pushBriefStatus').textContent = '先整理成面向同学们的介绍，再检查和修改下方信息。';
+      renderPushBrief();
       ['brainstorm','planning','content'].forEach(stage => { activityAttachments[stage] = []; renderAttachments(stage); document.getElementById(`${stage}Result`).hidden = true; });
       ['brainstorm','planning','content'].forEach(stage => { document.getElementById(`${stage}Error`).hidden = true; document.getElementById(`${stage}Meta`).textContent = ''; });
       ['brainstormEditor','planningEditor','contentOutput','brainstormAdvisorLog'].forEach(id => document.getElementById(id).replaceChildren());
       advisorHistory.length = 0; contentDraft = null; brainstormDraft = ''; planningDraft = '';
-      libraryCandidates = []; librarySelectedIds = []; libraryTemplates = []; libraryInitialized = false; libraryQuery = ''; document.getElementById('contentTemplate').replaceChildren(new Option('由 Agent 按主题选择', '')); renderLibrary();
+      libraryCandidates = []; librarySelectedIds = []; libraryTemplates = []; libraryInitialized = false; libraryQuery = ''; document.getElementById('contentTemplate').replaceChildren(new Option('由 Agent 按主题选择', '')); renderLibrary(); renderTemplateGallery();
       showPlanningDocuments({});
+      document.getElementById('pushWritingReferences').replaceChildren(); document.getElementById('pushImageSuggestions').replaceChildren();
       document.querySelectorAll('#contentOptions input').forEach(input => { input.checked = input.value === 'push'; });
+      updatePushControls();
       setActivityStage('brainstorm'); restoringProject = false;
     }
 
@@ -592,7 +876,13 @@
       resetActivityForm(); restoringProject = true;
       activeProjectId = id; localStorage.setItem('coe_active_project', id);
       const state = data.state || {};
+      // Recreate a stored option before assigning values; assigning a select
+      // value absent from its options otherwise silently loses the selection.
+      if (state.fields?.contentTemplate) document.getElementById('contentTemplate').append(new Option('已保存的排版模板', state.fields.contentTemplate));
       for (const [field, value] of Object.entries(state.fields || {})) if (document.getElementById(field)) document.getElementById(field).value = value;
+      if (!state.fields?.pushTemplateMode) document.getElementById('pushTemplateMode').value = state.fields?.contentTemplate ? 'manual' : 'auto';
+      pushGuests = state.push_guests || []; pushModules = state.push_modules || []; pushBriefInitialized = !!state.push_brief_initialized; pushBriefNotes = state.push_brief_notes || [];
+      renderPushBrief();
       for (const [field, value] of Object.entries(state.meta || {})) if (document.getElementById(field)) document.getElementById(field).textContent = value;
       for (const stage of ['brainstorm','planning','content']) { activityAttachments[stage] = state.attachments?.[stage] || []; renderAttachments(stage); }
       for (const stage of ['brainstorm','planning']) {
@@ -602,18 +892,22 @@
       contentDraft = state.content_result || null;
       if (contentDraft) renderContentResults(contentDraft);
       document.querySelectorAll('#contentOptions input').forEach(input => { input.checked = (state.content_types || []).includes(input.value); });
+      updatePushControls();
       showPlanningDocuments(state.planning_documents || {});
       advisorHistory.length = 0; advisorHistory.push(...(state.advisor_history || []));
       for (const turn of advisorHistory) addAdvisorMessage(turn.role, turn.content);
       libraryCandidates = state.library_candidates || []; librarySelectedIds = state.library_selected_ids || [];
+      // Older workspaces labelled every 学校学院 image as a fixed brand image.
+      libraryCandidates = libraryCandidates.map(item => item.media_role === 'school_brand' && !/学校学院\/(首图|尾图)\.[^/]+$/.test(item.relative_path || '') ? {...item, media_role:item.label?.includes('工小成') ? 'mascot' : 'general'} : item);
       libraryInitialized = !!state.library_initialized; libraryQuery = state.library_query || ''; renderLibrary();
       setActivityStage(state.stage || 'brainstorm'); setMode('push');
       restoringProject = false; document.getElementById('projectSaveStatus').textContent = '已载入';
+      if (activeStage === 'content') loadPushReferences().catch(error => { document.getElementById('pushReferenceStatus').textContent = error.message; });
       if (activeStage === 'content') { if (!libraryInitialized) loadLibrarySuggestions().catch(error => { document.getElementById('libraryStatus').textContent = error.message; }); loadLibraryTemplates().catch(() => {}); }
       await loadProjectList();
     }
 
-    function attachmentPayload(stage) { return activityAttachments[stage].map(({name, mime_type, size, text, data_url, usage, placement}) => ({name, mime_type, size, text, data_url, usage, placement})); }
+    function attachmentPayload(stage) { return activityAttachments[stage].map(({name, mime_type, size, text, data_url, usage, placement, usage_mode, section_heading, guest_index}) => ({name, mime_type, size, text, data_url, usage, placement, usage_mode, section_heading, guest_index})); }
 
     function renderAttachments(stage) {
       const target = document.getElementById(`${stage}Attachments`); if (!target) return;
@@ -621,13 +915,34 @@
       activityAttachments[stage].forEach((file, index) => {
         const chip = document.createElement('span'); chip.className = 'attachment-chip';
         chip.append(document.createTextNode(`${file.name} · ${Math.ceil(file.size / 1024)}KB${file.size > 12000000 ? ' · 超过 12MB，请压缩后重传' : ''}`));
+        const usage = document.createElement('input'); usage.className = 'attachment-usage'; usage.placeholder = '用途或参考要求（可选）'; usage.setAttribute('aria-label', `${file.name} 的用途或参考要求`); usage.maxLength = 500; usage.value = file.usage || '';
+        usage.addEventListener('input', () => { file.usage = usage.value; scheduleProjectSave(); }); chip.append(usage);
         if (file.mime_type?.startsWith('image/') || /\.(png|jpe?g|webp|gif)$/i.test(file.name)) {
-          const usage = document.createElement('input'); usage.className = 'attachment-usage'; usage.placeholder = '如何使用（可选）'; usage.value = file.usage || '';
-          usage.addEventListener('input', () => { file.usage = usage.value; scheduleProjectSave(); });
+          if (stage === 'content' && file.data_url) { const thumb = document.createElement('img'); thumb.src = file.data_url; thumb.alt = file.name; thumb.className = 'attachment-thumb'; chip.prepend(thumb); }
+          const mode = document.createElement('select'); mode.className = 'attachment-placement'; mode.setAttribute('aria-label', `${file.name} 的使用方式`);
+          [['content','加入推送'],['reference','仅作参考']].forEach(([value, label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; option.selected = (file.usage_mode || 'content') === value; mode.append(option); });
           const placement = document.createElement('select'); placement.className = 'attachment-placement';
+          placement.setAttribute('aria-label', `${file.name} 的放置位置`); placement.disabled = file.usage_mode === 'reference';
+          mode.addEventListener('change', () => { file.usage_mode = mode.value; renderAttachments(stage); scheduleProjectSave(); });
           [['auto','自动'],['首图','首图'],['正文','正文'],['尾图','尾图']].forEach(([value, label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; option.selected = (file.placement || 'auto') === value; placement.append(option); });
-          placement.addEventListener('change', () => { file.placement = placement.value; scheduleProjectSave(); });
-          chip.append(usage, placement);
+          placement.addEventListener('change', () => { file.placement = placement.value; if (['首图','尾图'].includes(placement.value)) { file.section_heading = ''; clearGuestBinding(file); } renderAttachments(stage); scheduleProjectSave(); });
+          chip.append(mode, placement);
+          if (stage === 'content') {
+            if (pushGuests.length) {
+              const guest = document.createElement('select'); guest.className = 'attachment-placement'; guest.setAttribute('aria-label', `${file.name} 对应嘉宾`);
+              guest.append(new Option('嘉宾位置：自动', ''));
+              pushGuests.forEach((person, guestIndex) => guest.append(new Option(`放在第${guestIndex + 1}位嘉宾后（${person.name || '未命名'}）`, String(guestIndex))));
+              const guestIndex = Number.isInteger(file.guest_index) ? file.guest_index : inferGuestIndex(file.usage);
+              guest.value = guestIndex === null ? '' : String(guestIndex); guest.disabled = file.usage_mode === 'reference' || ['首图','尾图'].includes(file.placement);
+              guest.addEventListener('change', () => { clearGuestBinding(file); file.guest_index = guest.value === '' ? null : Number(guest.value); if (file.guest_index !== null) { file.placement = '正文'; file.section_heading = ''; } renderAttachments(stage); scheduleProjectSave(); }); chip.append(guest);
+            }
+            const section = document.createElement('select'); section.className = 'attachment-placement'; section.setAttribute('aria-label', `${file.name} 的正文板块`);
+            const headings = [...new Set([...pushModules.map(m => m.heading).filter(Boolean), ...pushGuests.filter(g => g.name.trim()).map(g => `嘉宾：${g.name.trim()}`), ...(contentDraft?.result?.items?.find(i => i.type === 'push')?.result?.sections || []).map(s => s.heading).filter(Boolean), '活动信息','具体时间安排','参与方式',file.section_heading].filter(Boolean))];
+            section.append(new Option('正文位置：自动', ''));
+            for (const heading of headings) section.append(new Option(`放在「${heading}」之后`, heading));
+            section.value = file.section_heading || ''; section.disabled = file.usage_mode === 'reference' || ['首图','尾图'].includes(file.placement);
+            section.addEventListener('change', () => { clearGuestBinding(file); file.section_heading = section.value; if (section.value) file.placement = '正文'; if (section.value.startsWith('嘉宾：')) { const i = pushGuests.findIndex(g => g.name.trim() === section.value.slice(3)); if (i >= 0) { file.guest_index = i; file.section_heading = ''; } } renderAttachments(stage); scheduleProjectSave(); }); chip.append(section);
+          }
         }
         const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '×';
         remove.addEventListener('click', () => { activityAttachments[stage].splice(index, 1); renderAttachments(stage); scheduleProjectSave(); });
@@ -636,10 +951,10 @@
     }
 
     async function readDroppedFile(file) {
-      const item = {name:file.name, mime_type:file.type || 'application/octet-stream', size:file.size, text:'', data_url:'', usage:'', placement:'auto'};
+      const item = {name:file.name, mime_type:file.type || 'application/octet-stream', size:file.size, text:'', data_url:'', usage:'', placement:'auto', usage_mode:'content'};
       if (file.type.startsWith('text/') || /\.(txt|md|csv|json|srt|vtt)$/i.test(file.name)) {
         item.text = (await file.text()).slice(0, 30000);
-      } else if ((file.type.startsWith('image/') || /\.(pdf|docx|xlsx|pptx|odt|ods|odp)$/i.test(file.name)) && file.size <= 12000000) {
+      } else if ((file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|pdf|docx|xlsx|pptx|odt|ods|odp)$/i.test(file.name)) && file.size <= 12000000) {
         item.data_url = await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); });
       }
       return item;
@@ -662,10 +977,20 @@
       document.querySelectorAll('.dropzone').forEach(zone => {
         const stage = zone.dataset.dropzone; const picker = zone.querySelector('input');
         zone.addEventListener('click', event => { if (event.target !== picker) picker.click(); });
-        picker.addEventListener('change', event => addAttachments(stage, event.target.files));
+        picker.addEventListener('change', async event => { await addAttachments(stage, event.target.files); picker.value = ''; });
+        zone.addEventListener('keydown', event => { if (event.target === zone && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); picker.click(); } });
         zone.addEventListener('dragover', event => { event.preventDefault(); zone.classList.add('dragover'); });
         zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
         zone.addEventListener('drop', event => { event.preventDefault(); zone.classList.remove('dragover'); addAttachments(stage, event.dataTransfer.files); });
+      });
+      document.querySelectorAll('[data-attachment-stage]').forEach(field => {
+        const stage = field.dataset.attachmentStage;
+        field.addEventListener('dragover', event => { if (event.dataTransfer.types.includes('Files')) event.preventDefault(); });
+        field.addEventListener('drop', event => { if (event.dataTransfer.files.length) { event.preventDefault(); addAttachments(stage, event.dataTransfer.files); } });
+        field.addEventListener('paste', event => {
+          const files = [...(event.clipboardData?.files || [])];
+          if (files.length) { if (!event.clipboardData.getData('text/plain')) event.preventDefault(); addAttachments(stage, files); }
+        });
       });
     }
 
@@ -676,6 +1001,7 @@
       document.getElementById('scroll').scrollTop = 0;
       scheduleProjectSave();
       if (stage === 'content' && !restoringProject && !libraryInitialized) { loadLibrarySuggestions().catch(error => { document.getElementById('libraryStatus').textContent = error.message; }); loadLibraryTemplates().catch(() => {}); }
+      if (stage === 'content' && !restoringProject && libraryInitialized) { loadPushReferences().catch(error => { document.getElementById('pushReferenceStatus').textContent = error.message; }); loadLibraryTemplates().catch(() => {}); }
     }
 
     function prettyJson(value) {
@@ -816,15 +1142,210 @@
       finally { button.disabled = false; button.textContent = '按当前修改重新导出'; }
     }
 
+    function syncPushBriefFromPayload(brief) {
+      if (!brief) return;
+      const values = {event_time:'pushEventTime',location:'pushLocation',schedule:'pushSchedule',introduction:'pushIntroduction',participation:'pushParticipation'};
+      for (const [key,id] of Object.entries(values)) if (brief[key] !== undefined) document.getElementById(id).value = brief[key] || '';
+      pushGuests = Array.isArray(brief.guests) ? brief.guests : [];
+      pushModules = Array.isArray(brief.modules) ? brief.modules : [];
+      pushBriefInitialized = true; renderPushBrief(); renderAttachments('content');
+    }
+
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+
+    function projectToMarkdown(project) {
+      const lines = [`# ${project.title || '活动推送'}`, '', project.lead || '', ''];
+      for (const section of project.sections || []) {
+        if (!section?.heading) continue;
+        lines.push(`## ${section.heading}`, '');
+        if (section.body) lines.push(section.body, '');
+        for (const index of section.guest_indices || []) {
+          const guest = project.guest_cards?.[index]; if (!guest) continue;
+          lines.push(`### 嘉宾：${guest.name || `第${index + 1}位嘉宾`}`, '');
+          if (guest.identity) lines.push(guest.identity, '');
+          if (guest.introduction) lines.push(guest.introduction, '');
+        }
+      }
+      lines.push('<!-- 活动信息、图片位置和未确认事项由系统保留；图片请在下方素材设置中调整。 -->');
+      return lines.join('\n').replace(/\n{4,}/g, '\n\n\n').trim() + '\n';
+    }
+
+    function markdownToProject(markdown, original) {
+      const project = JSON.parse(JSON.stringify(original));
+      const lines = String(markdown || '').replace(/\r/g, '').split('\n');
+      let title = '', lead = [], sections = [], current = null, guest = null;
+      const flushGuest = () => {
+        if (!guest || guest.index < 0 || !project.guest_cards?.[guest.index]) return;
+        const text = guest.lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+        const parts = text.split(/\n\s*\n/).map(value => value.trim()).filter(Boolean);
+        if (parts.length) project.guest_cards[guest.index].identity = parts.shift();
+        if (parts.length) project.guest_cards[guest.index].introduction = parts.join('\n\n');
+      };
+      for (const raw of lines) {
+        const line = raw.trimEnd();
+        if (/^#\s+/.test(line) && !/^##/.test(line)) { title = line.replace(/^#\s+/, '').trim(); guest = null; continue; }
+        if (/^##\s+/.test(line) && !/^###/.test(line)) { flushGuest(); current = {heading:line.replace(/^##\s+/, '').trim(), body:[], guest_indices:[]}; sections.push(current); guest = null; continue; }
+        if (/^###\s+嘉宾：/.test(line) && current) { flushGuest(); const name = line.replace(/^###\s+嘉宾：/, '').trim(); const index = (project.guest_cards || []).findIndex(item => item.name === name); guest = {index: index >= 0 ? index : -1, lines:[]}; if (index >= 0) current.guest_indices.push(index); continue; }
+        if (line.trim().startsWith('<!--')) continue;
+        if (guest) { guest.lines.push(line); continue; }
+        if (current) current.body.push(line); else lead.push(line);
+      }
+      flushGuest();
+      if (title) project.title = title;
+      project.lead = lead.join('\n').trim();
+      const oldSections = project.sections || [];
+      project.sections = sections.map((section, index) => {
+        const old = oldSections[index] || {};
+        const result = {...old, heading:section.heading, body:section.body.join('\n').replace(/\n{3,}/g, '\n\n').trim()};
+        if (section.guest_indices.length) result.guest_indices = section.guest_indices;
+        else if (old.guest_indices) result.guest_indices = old.guest_indices;
+        return result;
+      });
+      return project;
+    }
+
+    function renderMarkdownPreview(target, markdown) {
+      const rows = String(markdown || '').replace(/\r/g, '').split('\n'); let html = '';
+      for (const raw of rows) {
+        const line = raw.trim(); if (!line || line.startsWith('<!--')) continue;
+        if (line.startsWith('### ')) html += `<h3>${escapeHtml(line.slice(4))}</h3>`;
+        else if (line.startsWith('## ')) html += `<h2>${escapeHtml(line.slice(3))}</h2>`;
+        else if (line.startsWith('# ')) html += `<h1>${escapeHtml(line.slice(2))}</h1>`;
+        else if (line.startsWith('> ')) html += `<p><em>${escapeHtml(line.slice(2))}</em></p>`;
+        else html += `<p>${escapeHtml(line).replace(/\n/g, '<br>')}</p>`;
+      }
+      target.innerHTML = html || '<p style="color:#98a2b3">在左侧输入内容，右侧会即时预览。</p>';
+    }
+
+    function renderPushEditor(item, card) {
+      const section = document.createElement('section'); section.className = 'push-editor';
+      const title = document.createElement('strong'); title.textContent = 'Markdown 编辑器（手动修改，实时预览）'; section.append(title);
+      const help = document.createElement('p'); help.className = 'field-help'; help.textContent = '用 # 表示标题、## 表示板块、### 嘉宾：姓名表示嘉宾卡片。这里只改文字和板块结构，图片绑定仍由素材设置控制。'; section.append(help);
+      const grid = document.createElement('div'); grid.className = 'push-editor-grid';
+      const editor = document.createElement('textarea'); editor.maxLength = 60000; editor.setAttribute('aria-label','Markdown 推送编辑区'); editor.value = item.markdown_draft || projectToMarkdown(item.result);
+      const toolbar = document.createElement('div'); toolbar.className = 'push-actions';
+      const addMarkdown = (before, after = '') => { const start = editor.selectionStart, end = editor.selectionEnd, value = editor.value; const selected = value.slice(start,end) || '文字'; editor.setRangeText(`${before}${selected}${after}`,start,end,'select'); editor.dispatchEvent(new Event('input',{bubbles:true})); editor.focus(); };
+      for (const [label,before,after] of [['标题','# ',''],['板块','## ',''],['加粗','**','**'],['引用','> ',''],['分隔线','\n---\n','']]) { const button=document.createElement('button'); button.type='button'; button.textContent=label; button.addEventListener('click',()=>addMarkdown(before,after)); toolbar.append(button); }
+      const preview = document.createElement('div'); preview.className = 'markdown-preview'; preview.setAttribute('aria-label','Markdown 实时预览'); renderMarkdownPreview(preview, editor.value);
+      editor.addEventListener('input', () => { item.markdown_draft = editor.value; renderMarkdownPreview(preview, editor.value); scheduleProjectSave(); });
+      grid.append(editor, preview); section.append(toolbar,grid);
+      const actions = document.createElement('div'); actions.className = 'push-editor-actions';
+      const apply = document.createElement('button'); apply.type = 'button'; apply.textContent = '应用修改并生成新预览';
+      const status = document.createElement('span'); status.className = 'push-editor-status';
+      apply.addEventListener('click', () => applyMarkdownEditor(item, editor, apply, status)); actions.append(apply, status); section.append(actions); card.append(section);
+    }
+
+    async function applyMarkdownEditor(item, editor, button, status) {
+      if (button.disabled || pushRevisionBusy) return;
+      const targetDraft = contentDraft; const targetItem = item; const markdown = editor.value.trim();
+      if (!markdown) { status.textContent = '编辑内容不能为空。'; return; }
+      button.disabled = true; status.textContent = '正在生成新的排版预览…';
+      const oldPreview = {title:item.result.title || '此前版本', preview_url:item.preview_url, download_url:item.download_url, created_at:new Date().toISOString()};
+      try {
+        const response = await apiFetch('/api/activity/push/render', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({push_project:markdownToProject(markdown,item.result),attachments:attachmentPayload('content'),library_asset_ids:(item.embedded_assets || []).map(asset => asset.id).filter(Boolean),template_id:item.template_choice?.id || selectedPushTemplate(),theme:document.getElementById('contentTheme').value.trim(),audience:document.getElementById('contentAudience').value.trim(),reviewer:document.getElementById('contentReviewer').value.trim(),hero_image:item.hero_image || {}})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '编辑预览生成失败');
+        if (contentDraft !== targetDraft || item !== targetItem) throw new Error('活动或稿件已切换，本次编辑未覆盖当前稿件。');
+        const versions = [...(item.versions || [])]; if (oldPreview.preview_url && !versions.some(version => version.preview_url === oldPreview.preview_url)) versions.push(oldPreview);
+        Object.assign(item, data.item, {push_brief:item.push_brief, template_choice:item.template_choice, hero_image:item.hero_image, markdown_draft:markdown, versions}); renderContentResults(contentDraft); await saveProjectNow();
+        status.textContent = '已生成新预览，旧版本已保留。';
+      } catch (error) { status.textContent = error.message; }
+      finally { button.disabled = false; }
+    }
+
+    function renderPushRevision(item, card) {
+      const revision = document.createElement('section'); revision.className = 'push-revision';
+      const revisionTitle = document.createElement('strong'); revisionTitle.textContent = '对话修改这篇推送'; revision.append(revisionTitle);
+      const revisionHint = document.createElement('p'); revisionHint.className = 'field-help'; revisionHint.textContent = '例如：把第1部分改得更亲切；第2位嘉宾照片放在其介绍后；删掉重复的活动形式。'; revision.append(revisionHint);
+      const revisionLog = document.createElement('div'); revisionLog.className = 'push-revision-log';
+      for (const turn of item.revision_history || []) { const line = document.createElement('div'); line.className = turn.role; line.textContent = `${turn.role === 'user' ? '你' : 'Agent'}：${turn.content}`; revisionLog.append(line); }
+      if ((item.versions || []).length) {
+        const versions = document.createElement('details'); const summary = document.createElement('summary'); summary.textContent = `此前版本（${item.versions.length}）`; versions.append(summary);
+        for (const version of item.versions) { const p = document.createElement('p'); const link = document.createElement('a'); link.href = version.preview_url; link.target = '_blank'; link.textContent = version.title || '打开此前版本'; p.append(link); versions.append(p); }
+        revision.append(versions);
+      }
+      revision.append(revisionLog);
+      const revisionInput = document.createElement('textarea'); revisionInput.maxLength = 4000; revisionInput.value = item.revision_input || ''; revisionInput.placeholder = '写出要修改的内容、顺序、图片位置或语气要求…'; revisionInput.addEventListener('input', () => { item.revision_input = revisionInput.value; scheduleProjectSave(); }); revision.append(revisionInput);
+      revisionInput.setAttribute('aria-label', '对当前推送的修改意见');
+      const revisionButton = document.createElement('button'); revisionButton.type = 'button'; revisionButton.textContent = '提交修改并重新预览'; revisionButton.disabled = pushRevisionBusy;
+      revisionButton.addEventListener('click', () => revisePush(item, revisionInput, revisionButton)); revision.append(revisionButton); card.append(revision);
+    }
+
     function renderContentResults(data) {
       contentDraft = data;
       const output = document.getElementById('contentOutput'); output.replaceChildren();
       for (const item of data.result.items || []) {
         const card = document.createElement('div'); card.className = 'content-result-card';
         const title = document.createElement('strong'); title.textContent = `${item.agent.agent_label} · ${item.model}`; card.append(title);
-        const summary = document.createElement('p'); summary.textContent = JSON.stringify(item.result, null, 2); card.append(summary);
+        if (item.type === 'push') {
+          const copy = document.createElement('div'); copy.className = 'push-copy';
+          const heading = document.createElement('h3'); heading.textContent = item.result.title || '预热推送'; copy.append(heading);
+          const paragraph = text => { if (!text) return; const p = document.createElement('p'); p.textContent = text; copy.append(p); };
+          paragraph(item.result.lead);
+          for (const section of item.result.sections || []) {
+            if (!section.body && !section.guest_indices?.length) continue;
+            if (section.heading) { const h = document.createElement('h4'); h.textContent = section.heading; copy.append(h); }
+            paragraph(section.body);
+            for (const index of section.guest_indices || []) {
+              const guest = item.result.guest_cards?.[index]; if (!guest) continue;
+              const name = document.createElement('h4'); name.textContent = guest.name || `嘉宾 ${index + 1}`; copy.append(name);
+              paragraph(guest.identity); paragraph(guest.introduction);
+            }
+          }
+          const info = item.result.activity_info || {};
+          paragraph([['时间', info.event_time],['地点',info.location],['对象',info.audience]].filter(([,value]) => value).map(([label,value]) => `${label}：${value}`).join('\n'));
+          if (item.result.schedule) { const h = document.createElement('h4'); h.textContent = '具体时间安排'; copy.append(h); paragraph(item.result.schedule); }
+          if (item.result.participation) { const h = document.createElement('h4'); h.textContent = '参与方式'; copy.append(h); paragraph(item.result.participation); }
+          card.append(copy);
+        }
+        const raw = document.createElement('details'); const rawTitle = document.createElement('summary'); rawTitle.textContent = item.type === 'push' ? '查看结构化数据（高级）' : '查看生成方案';
+        const rawText = document.createElement('pre'); rawText.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;'; rawText.textContent = JSON.stringify(item.result, null, 2); raw.append(rawTitle,rawText); card.append(raw);
         if (item.preview_url) { const link = document.createElement('a'); link.href = item.preview_url; link.target = '_blank'; link.textContent = '打开图文推送 HTML 预览'; card.append(link); }
+        if (item.download_url) { const link = document.createElement('a'); link.href = item.download_url; link.download = ''; link.style.marginLeft = '14px'; link.textContent = '下载 HTML'; card.append(link); }
+        if (item.type === 'push' && item.preview_url) {
+          const details = document.createElement('details'); const summary = document.createElement('summary'); summary.textContent = '在这里预览排版'; details.append(summary);
+          details.addEventListener('toggle', () => { if (!details.open || details.querySelector('iframe')) return; const frame = document.createElement('iframe'); frame.className = 'push-preview'; frame.title = '预热推送排版预览'; frame.setAttribute('sandbox',''); frame.src = item.preview_url; details.append(frame); }); card.append(details);
+          if (item.revision_history?.length || item.versions?.length) details.open = true;
+        }
+        for (const preview of item.related_previews || []) {
+          const row = document.createElement('p'); const link = document.createElement('a'); link.href = preview.preview_url; link.target = '_blank'; link.textContent = preview.title || '查看相关预览'; row.append(link); card.append(row);
+        }
+        const reviewNotes = [...new Set([...(item.review_notes || []), ...(item.result.review_notes || []), ...(item.result.checks || [])])];
+        if (reviewNotes.length) {
+          const panel = document.createElement('div'); panel.className = 'editor-card'; const heading = document.createElement('strong'); heading.textContent = '人工审阅事项（不进入图文）'; panel.append(heading);
+          const list = document.createElement('ul'); for (const note of reviewNotes) { const row = document.createElement('li'); row.textContent = typeof note === 'string' ? note : JSON.stringify(note); list.append(row); } panel.append(list); card.append(panel);
+        }
+        if (item.template_choice) { const note = document.createElement('p'); note.textContent = `排版：${item.template_choice.label} · ${item.template_choice.reason}`; card.append(note); }
+        if (item.layout_plan?.length) {
+          const details = document.createElement('details'); const summary = document.createElement('summary'); summary.textContent = '查看各板块排版安排'; details.append(summary);
+          const list = document.createElement('ul');
+          for (const block of item.layout_plan) { const row = document.createElement('li'); const mode = block.layout === 'plain' ? '普通正文' : block.layout === 'heading' ? `标题参考 ${block.label}，正文通栏` : `组件参考 ${block.label}`; row.textContent = `${block.heading}：${mode}${block.reason ? '；' + block.reason : ''}`; list.append(row); }
+          details.append(list); card.append(details);
+        }
+        if (item.result.writing_style_notes) { const note = document.createElement('p'); note.textContent = `行文安排：${typeof item.result.writing_style_notes === 'string' ? item.result.writing_style_notes : JSON.stringify(item.result.writing_style_notes)}`; card.append(note); }
+        if (item.revision_references) {
+          const details = document.createElement('details'); const summary = document.createElement('summary'); summary.textContent = '本轮修改检索的历史图文参考'; details.append(summary);
+          const seen = new Set();
+          for (const reference of [...(item.revision_references.writing || []), ...(item.revision_references.tables || [])]) {
+            if (!reference.source_url || seen.has(reference.source_url)) continue; seen.add(reference.source_url);
+            const p = document.createElement('p'); const a = document.createElement('a'); a.href = reference.source_url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = reference.title || '历史参考'; p.append(a); details.append(p);
+          }
+          if (!seen.size) { const p = document.createElement('p'); p.textContent = '本轮未找到合适的历史参考，使用内置排版组件。'; details.append(p); }
+          card.append(details);
+        }
+        if (item.image_recommendations?.length) { const label = document.createElement('h4'); label.textContent = '按板块推荐配图'; card.append(label); const grid = document.createElement('div'); grid.className = 'library-grid'; renderImageSuggestions(grid, item.image_recommendations); card.append(grid); }
+        if (item.hero_image) {
+          if (item.hero_image.ok) { const image = document.createElement('img'); image.src = item.hero_image.url; image.alt = '活动主题图（AI 创作）'; image.style.cssText = 'display:block;width:100%;max-width:620px;height:auto;margin-top:12px;'; card.append(image); }
+          const note = document.createElement('p'); note.textContent = item.hero_image.ok ? `主题图：${item.hero_image.model} · 已放在固定首图之后 · ${(item.hero_image.references || []).map(r => r.label).join('、')}` : item.hero_image.error; card.append(note);
+        }
         if ((item.embedded_assets || []).length) { const note = document.createElement('p'); note.textContent = `已加入本地图片：${item.embedded_assets.map(asset => asset.label).join('、')}`; card.append(note); }
+        if (item.image_placements?.length) {
+          const details = document.createElement('details'); const summary = document.createElement('summary'); summary.textContent = '查看上传图片对应位置'; details.append(summary);
+          for (const placement of item.image_placements) { const p = document.createElement('p'); const guest = Number.isInteger(placement.guest_index) ? item.result.guest_cards?.[placement.guest_index] : null;
+            p.textContent = `${placement.name} → ${placement.omit ? '未插入，见审阅事项' : guest ? `第${placement.guest_index + 1}位嘉宾（${guest.name}）介绍后` : placement.section_heading || item.result.sections?.[placement.section_index]?.heading || '正文 / 指定位置'}`; details.append(p); }
+          card.append(details);
+        }
+        if (item.type === 'push') renderPushEditor(item, card);
+        if (item.type === 'push') renderPushRevision(item, card);
         output.append(card);
       }
       document.getElementById('contentMeta').textContent = `已生成 ${data.result.items.length} 项 · 参考本地图片 ${(data.result.library_assets || []).length} 张`;
@@ -835,25 +1356,97 @@
       scheduleProjectSave();
     }
 
+    async function revisePush(item, input, button) {
+      const message = input.value.trim();
+      const box = document.getElementById('contentError');
+      if (!message || button.disabled || pushRevisionBusy) return;
+      if (document.getElementById('contentButton').disabled || document.getElementById('heroOnlyButton').disabled) { box.textContent = '正在生成内容，请完成后再提交修改。'; box.hidden = false; return; }
+      const targetProject = activeProjectId;
+      const targetDraft = contentDraft;
+      const targetItem = item;
+      const beforeBrief = JSON.stringify(pushBriefPayload());
+      const beforeAttachments = JSON.stringify(attachmentPayload('content'));
+      button.disabled = true; button.textContent = '正在按意见修改…'; box.hidden = true;
+      pushRevisionBusy = true;
+      try {
+        const response = await apiFetch('/api/activity/push/revise', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            planning:document.getElementById('planningOutput').value.trim(), push_project:item.result, brief:item.push_brief || pushBriefPayload(), message,
+            history:(item.revision_history || []).slice(-8), theme:document.getElementById('contentTheme').value.trim(),
+            audience:document.getElementById('contentAudience').value.trim(), requirements:document.getElementById('contentRequirements').value.trim(),
+            reviewer:document.getElementById('contentReviewer').value.trim(), attachments:attachmentPayload('content'),
+            library_asset_ids:(item.embedded_assets || []).map(asset => asset.id).filter(Boolean).slice(0,6), template_id:item.template_choice?.id || selectedPushTemplate(), hero_image:item.hero_image || {}
+          })
+        });
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '推送修改失败');
+        if (!data.item?.result || !data.item.preview_url) throw new Error('修改结果不完整，原稿已保留。');
+        if (targetProject !== activeProjectId || targetDraft !== contentDraft || targetItem !== contentDraft.result.items.find(candidate => candidate === targetItem)) throw new Error('活动或稿件已切换，本次修改未覆盖当前活动。');
+        const oldPreview = {title:item.result.title || '此前版本', preview_url:item.preview_url, download_url:item.download_url, created_at:new Date().toISOString()};
+        const history = [...(item.revision_history || []), {role:'user',content:message}, {role:'assistant',content:data.reply || '已完成修改，请检查新的预览。'}];
+        const revised = data.item; const versions = [...(item.versions || [])]; if (oldPreview.preview_url && !versions.some(version => version.preview_url === oldPreview.preview_url)) versions.push(oldPreview);
+        const preserved = {template_choice:item.template_choice, hero_image:item.hero_image, versions, revision_history:history, revision_input:input.value.trim() === message ? '' : input.value, markdown_draft:projectToMarkdown(data.item.result)};
+        Object.assign(item, revised, preserved);
+        const afterBrief = JSON.stringify(pushBriefPayload()); if (afterBrief === beforeBrief && data.item.push_brief) syncPushBriefFromPayload(data.item.push_brief);
+        if (JSON.stringify(attachmentPayload('content')) === beforeAttachments) (data.attachment_settings || []).forEach(setting => { const file = activityAttachments.content[setting.attachment_index]; if (!file) return; Object.assign(file, {usage:setting.usage || '', usage_mode:setting.usage_mode || file.usage_mode, placement:setting.placement || file.placement, section_heading:setting.section_heading || '', guest_index:Number.isInteger(setting.guest_index) ? setting.guest_index : null}); });
+        else item.revision_history.push({role:'assistant',content:'生成期间附件已调整，新预览使用提交时的附件；已保留你后续填写的附件设置。'});
+        if (afterBrief !== beforeBrief) item.revision_history.push({role:'assistant',content:'生成期间表单已调整，已保留你的输入；新预览基于提交时的稿件表单。'});
+        renderAttachments('content');
+        renderContentResults(contentDraft); await saveProjectNow();
+      } catch (error) {
+        box.textContent = error.message; box.hidden = false;
+      } finally { pushRevisionBusy = false; button.disabled = false; button.textContent = '提交修改并重新预览'; document.querySelectorAll('.push-revision button').forEach(control => { control.disabled = false; }); }
+    }
+
     async function runContent() {
       const button = document.getElementById('contentButton');
       const planning = document.getElementById('planningOutput').value.trim();
       const types = [...document.querySelectorAll('#contentOptions input:checked')].map(input => input.value);
-      if (planning.length < 10 || !types.length || button.disabled) return;
+      if (button.disabled) return;
+      const box = document.getElementById('contentError');
+      const fail = message => { box.textContent = message; box.hidden = false; };
+      if (pushRevisionBusy) { fail('正在修改推送，请完成后再重新生成内容。'); return; }
+      if (!types.length) { fail('请先选择需要制作的内容。'); return; }
+      if (types.includes('push') && document.getElementById('preparePushBrief').disabled) { fail('正在整理推送信息，请等表单补全后检查再生成。'); return; }
+      if (planning.length < 10 && types.some(type => type !== 'push')) { fail('制作海报、问卷或 PPT 前，请先完成策划案。'); return; }
+      if (planning.length < 10 && (!document.getElementById('contentTheme').value.trim() || !document.getElementById('pushIntroduction').value.trim())) { fail('请先填写活动主题与简介，或根据前两步补全表单。'); return; }
+      const pushBrief = pushBriefPayload();
+      const requestData = {planning,content_types:types,push_type:'预热',push_brief:types.includes('push') ? pushBrief : null,theme:document.getElementById('contentTheme').value.trim(),audience:document.getElementById('contentAudience').value.trim(),requirements:document.getElementById('contentRequirements').value.trim(),reviewer:document.getElementById('contentReviewer').value.trim(),attachments:attachmentPayload('content'),template_id:selectedPushTemplate(),...heroSettings()};
       button.disabled = true; button.textContent = '正在制作所选内容…';
       document.getElementById('contentError').hidden = true;
       try {
-        await ensureProject();
+        const targetProject = await ensureProject();
         if (!libraryInitialized) await loadLibrarySuggestions();
+        requestData.library_asset_ids = librarySelectedIds;
         const response = await apiFetch('/api/activity/content', {
           method: 'POST', headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({planning, content_types: types, theme: document.getElementById('contentTheme').value.trim(), audience: document.getElementById('contentAudience').value.trim(), requirements: document.getElementById('contentRequirements').value.trim(), reviewer: document.getElementById('contentReviewer').value.trim(), attachments: attachmentPayload('content'), library_asset_ids: librarySelectedIds, template_id: document.getElementById('contentTemplate').value})
+          body: JSON.stringify(requestData)
         });
         const data = await response.json(); if (!response.ok) throw new Error(data.detail || '内容制作失败');
+        if (activeProjectId !== targetProject) { throw new Error('活动已切换，本次结果未覆盖当前活动；导出的 HTML 保存在 data/graphic_previews。'); }
         renderContentResults(data);
         await saveProjectNow();
       } catch (error) { const box = document.getElementById('contentError'); box.textContent = error.message; box.hidden = false; }
-      finally { button.disabled = false; button.textContent = '生成所选内容'; }
+      finally { button.disabled = false; updatePushControls(); }
+    }
+
+    function heroSettings() { return {generate_hero:document.getElementById('heroMode').value === 'generate', hero_title:document.getElementById('heroTitle').value.trim(), hero_style:document.getElementById('heroStyle').value.trim()}; }
+
+    async function addHeroToExistingPush() {
+      const item = contentDraft?.result?.items?.find(item => item.type === 'push');
+      const status = document.getElementById('heroStatus');
+      if (pushRevisionBusy) { status.textContent = '正在修改推送，请完成后再生成主题图。'; return; }
+      if (!item) { status.textContent = '请先生成或载入一篇推送。'; return; }
+      const button = document.getElementById('heroOnlyButton'); button.disabled = true;
+      const targetProject = activeProjectId; const targetDraft = contentDraft;
+      status.textContent = '正在参考本地素材创作主题图…';
+      try {
+        const response = await apiFetch('/api/activity/push/hero', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({planning:document.getElementById('planningOutput').value, content_types:['push'], theme:document.getElementById('contentTheme').value.trim(), audience:document.getElementById('contentAudience').value.trim(), reviewer:document.getElementById('contentReviewer').value.trim(), library_asset_ids:librarySelectedIds, template_id:item.template_choice?.id || document.getElementById('contentTemplate').value, attachments:attachmentPayload('content'), push_project:item.result, ...heroSettings()})});
+        const data = await response.json(); if (!response.ok) throw new Error(data.detail || '主题图生成失败');
+        if (activeProjectId !== targetProject || contentDraft !== targetDraft) { throw new Error('活动已切换，图片已生成但未覆盖当前活动，请查看 data/generated_images。'); }
+        Object.assign(item, data); renderContentResults(contentDraft); await saveProjectNow(); status.textContent = '主题图已生成并保存，打开图文预览查看。';
+      } catch(error) { status.textContent = error.message; }
+      finally { button.disabled = false; }
     }
 
     const advisorHistory = [];
@@ -866,6 +1459,7 @@
         `策划补充：${document.getElementById('planningAdditions')?.value || '[未填写]'}`,
         `内容选择：${[...document.querySelectorAll('#contentOptions input:checked')].map(x => x.value).join('、') || '[未选择]'}`,
         `内容要求：${document.getElementById('contentRequirements')?.value || '[未填写]'}`,
+        `预热推送表单：${JSON.stringify(pushBriefPayload())}`,
         `拖入素材：${Object.entries(activityAttachments).flatMap(([stage, files]) => files.map(file => `${stage}/${file.name}`)).join('、') || '[没有]'}`,
         `本地图片素材：${libraryCandidates.filter(item => librarySelectedIds.includes(item.id)).map(item => item.label).join('、') || '[没有]'}`
       ].join('\n');
@@ -1023,7 +1617,7 @@
       event.preventDefault();
       generatePush();
     });
-    document.querySelectorAll('.activity-step').forEach(button => button.addEventListener('click', () => setActivityStage(button.dataset.stage)));
+    document.querySelectorAll('.activity-step').forEach(button => button.addEventListener('click', () => { setActivityStage(button.dataset.stage); if (button.dataset.stage === 'content') maybePreparePushInputs(); }));
     document.getElementById('brainstormButton').addEventListener('click', runBrainstorm);
     document.getElementById('toPlanningButton').addEventListener('click', () => {
       if (!document.getElementById('brainstormOutput').checkValidity()) { document.getElementById('brainstormOutput').reportValidity(); return; }
@@ -1035,10 +1629,22 @@
     document.getElementById('refreshPlanDocuments').addEventListener('click', refreshPlanningDocuments);
     document.getElementById('toContentButton').addEventListener('click', () => {
       if (!document.getElementById('planningOutput').checkValidity()) { document.getElementById('planningOutput').reportValidity(); return; }
-      document.getElementById('contentTheme').value = document.getElementById('planningOutput').value.match(/"title"\s*:\s*"([^"]+)/)?.[1] || '';
+      if (!document.getElementById('contentTheme').value.trim()) document.getElementById('contentTheme').value = document.getElementById('planningOutput').value.match(/"title"\s*:\s*"([^"]+)/)?.[1] || '';
       setActivityStage('content');
+      maybePreparePushInputs();
     });
     document.getElementById('contentButton').addEventListener('click', runContent);
+    document.getElementById('preparePushBrief').addEventListener('click', () => preparePushInputs().catch(error => { document.getElementById('pushBriefStatus').textContent = error.message; }));
+    document.getElementById('rewritePushIntro').addEventListener('click', () => preparePushInputs(true).catch(error => { document.getElementById('pushBriefStatus').textContent = error.message; }));
+    document.getElementById('addPushGuest').addEventListener('click', () => { if (pushGuests.length >= 12) return; pushGuests.push({name:'',identity:'',introduction:''}); pushBriefInitialized = true; renderPushBrief(); scheduleProjectSave(); document.getElementById(`push-guest-${pushGuests.length-1}-name`).focus(); });
+    document.getElementById('addPushModule').addEventListener('click', () => { if (pushModules.length >= 16) return; pushModules.push({heading:'',notes:''}); pushBriefInitialized = true; renderPushBrief(); scheduleProjectSave(); document.getElementById(`push-module-${pushModules.length-1}-heading`).focus(); });
+    document.getElementById('pushTemplateMode').addEventListener('change', () => { updatePushControls(); renderTemplateGallery(); });
+    document.getElementById('contentOptions').addEventListener('change', updatePushControls);
+    ['pushEventTime','pushLocation','pushSchedule','pushIntroduction','pushParticipation'].forEach(id => document.getElementById(id).addEventListener('input', () => { pushBriefInitialized = true; }));
+    document.getElementById('heroOnlyButton').addEventListener('click', addHeroToExistingPush);
+    document.getElementById('refreshPushReferences').addEventListener('click', () => loadPushReferences().catch(error => { document.getElementById('pushReferenceStatus').textContent = error.message; }));
+    document.getElementById('contentTemplate').addEventListener('change', renderTemplateGallery);
+    document.getElementById('refreshTemplates').addEventListener('click', async event => { event.target.disabled = true; try { await loadLibraryTemplates(true); } catch(error) { document.getElementById('templateStatus').textContent = error.message; } finally { event.target.disabled = false; } });
     document.getElementById('refreshLibrary').addEventListener('click', () => loadLibrarySuggestions(true).catch(error => { document.getElementById('libraryStatus').textContent = error.message; }));
     document.getElementById('brainstormAdvisorForm').addEventListener('submit', event => { event.preventDefault(); askBrainstormAdvisor(document.getElementById('brainstormAdvisorInput').value.trim()); });
     generatorView.addEventListener('input', scheduleProjectSave);
@@ -1056,6 +1662,7 @@
       });
     });
     setupDropzones();
+    renderPushBrief();
     const legacyImagePool = document.getElementById('imagePool');
     if (legacyImagePool) legacyImagePool.addEventListener('change', event => {
       const names = [...(event.target.files || [])].slice(0, 12).map(file => file.name);
